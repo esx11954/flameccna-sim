@@ -1,0 +1,2582 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>炎のCCNA 模擬試験② (Day20)</title>
+<style>
+  :root{
+    --bg:#eef1f3; --panel:#ffffff; --panel2:#f4f6f8; --border:#cfd6dc;
+    --fg:#20242a; --muted:#5a6671; --accent:#2f7bbf; --accent2:#1b4f7a;
+    --ok:#2e8b57; --ng:#c0392b; --link:#2f7bbf;
+    --term-bg:#000000; --term-fg:#d6d6d6;
+    --exam-head:#205a87;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--fg);
+    font-family:"Segoe UI","Hiragino Kaku Gothic ProN","Meiryo",sans-serif;font-size:14px;line-height:1.6}
+  button{font-family:inherit;cursor:pointer}
+  .hidden{display:none !important}
+  .wrap{max-width:1180px;margin:0 auto;padding:16px}
+  #examHeader{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:12px;color:#eaf1f7;
+    background:var(--exam-head);border-bottom:1px solid #16456b;padding:8px 16px;flex-wrap:wrap}
+  #examHeader .brand{font-weight:600;color:#fff;letter-spacing:.02em}
+  #examHeader .sp{flex:1}
+  .tag{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18);border-radius:3px;padding:2px 10px;font-size:12px;color:#eaf1f7}
+  #hdrMode{font-weight:600;color:#fff;background:#2f7bbf;border:1px solid #4a90c8}
+  #timer{font-variant-numeric:tabular-nums;font-weight:600;font-size:15px;padding:3px 10px;border-radius:3px;background:#1a4c73;border:1px solid #16456b;color:#fff}
+  #timer.warn{color:#3a2c00;background:#f0c419;border-color:#caa400}
+  #timer.crit{color:#fff;background:#c0392b;border-color:#9a2c20}
+  #saveInd{font-size:11px;color:#cfe0ee}
+  .card{background:var(--panel);border:1px solid var(--border);border-radius:4px;padding:20px;margin:12px 0}
+  .card h1{color:var(--accent2);margin:0 0 8px;font-weight:600}
+  input[type=text]{background:#fff;color:var(--fg);border:1px solid var(--border);border-radius:3px;padding:10px;font-size:15px;width:100%;max-width:360px}
+  .btn{background:var(--accent);color:#fff;border:1px solid #2a6ca8;border-radius:3px;padding:9px 18px;font-size:14px;font-weight:500}
+  .btn.sec{background:#fff;color:var(--accent2);border:1px solid var(--border)}
+  .btn:disabled{opacity:.4;cursor:not-allowed;background:#9bb6cd;border-color:#9bb6cd;color:#eef3f8}
+  .notice{background:#eaf2f9;border:1px solid #bcd6ea;color:#1b4f7a;border-radius:3px;padding:10px 12px;font-size:13px;margin:10px 0}
+  .qbox{background:var(--panel);border:1px solid var(--border);border-radius:4px;padding:20px;min-height:340px}
+  .qmeta{font-size:12px;color:var(--muted);margin-bottom:10px}
+  .qtext{font-size:15px;white-space:pre-wrap;margin-bottom:16px}
+  .qtext pre{background:#f3f4f6;border:1px solid var(--border);border-radius:3px;padding:10px;overflow:auto;font-family:Consolas,monospace;font-size:13px;color:#20242a}
+  .qimg{max-width:100%;border:1px solid var(--border);border-radius:3px;margin-bottom:14px;background:#fff}
+  .choice{display:flex;gap:10px;align-items:flex-start;background:#fff;border:1px solid var(--border);
+    border-radius:3px;padding:11px 13px;margin:7px 0;cursor:pointer}
+  .choice:hover{border-color:var(--accent);background:#f6fafd}
+  .choice input{margin-top:3px}
+  .simwrap{display:grid;grid-template-columns:minmax(380px,46%) 1fr;gap:12px}
+  @media(max-width:900px){ .simwrap{grid-template-columns:1fr} }
+  .simleft,.simright{min-width:0}
+  .subtabs{display:flex;gap:0;border-bottom:1px solid var(--border)}
+  .subtabs button{background:transparent;border:none;border-bottom:2px solid transparent;padding:7px 16px;color:var(--muted);font-size:13px}
+  .subtabs button.active{color:var(--accent2);font-weight:500;border-bottom-color:var(--accent)}
+  .subview{background:var(--panel);border:1px solid var(--border);border-top:none;border-radius:0 0 4px 4px;padding:14px;min-height:330px;max-height:430px;overflow:auto}
+  .subview ol{margin:0;padding-left:20px}
+  .subview li{margin-bottom:8px}
+  .topowrap{width:100%;background:#fbfbfd;border:1px solid var(--border);border-radius:4px}
+  .topowrap svg{display:block;width:100%;height:auto}
+  .devtabs{display:flex;gap:0;flex-wrap:wrap;background:#fff;border:1px solid var(--border);border-bottom:none;border-radius:4px 4px 0 0}
+  .devtabs button{background:transparent;border:none;border-bottom:2px solid transparent;padding:7px 15px;color:var(--muted);font-size:13px;font-family:Consolas,monospace}
+  .devtabs button.active{color:var(--accent2);font-weight:600;border-bottom-color:var(--accent)}
+  .term{background:var(--term-bg);border:1px solid var(--border);border-radius:0 0 4px 4px;height:420px;display:flex;flex-direction:column}
+  .termout{flex:1;overflow:auto;padding:10px;font-family:Consolas,"Courier New",monospace;font-size:13px;color:var(--term-fg);white-space:pre-wrap;line-height:1.45}
+  .terminline{display:flex;border-top:1px solid #1a1a1a;background:#000}
+  .termprompt{padding:8px 0 8px 10px;font-family:Consolas,monospace;font-size:13px;color:var(--term-fg);white-space:pre}
+  .terminline input{flex:1;background:#000;border:none;color:var(--term-fg);font-family:Consolas,monospace;font-size:13px;padding:8px 10px;outline:none}
+  #navbar{position:sticky;bottom:0;display:flex;align-items:center;gap:10px;background:#fff;
+    border-top:1px solid var(--border);padding:10px 16px;margin-top:16px}
+  #navbar .sp{flex:1}
+  #navHint{font-size:12px;color:var(--muted)}
+  .scorebig{font-size:48px;font-weight:600}
+  .pass{color:var(--ok)} .fail{color:var(--ng)}
+  table.res{width:100%;border-collapse:collapse;margin:8px 0}
+  table.res th,table.res td{border:1px solid var(--border);padding:6px 10px;text-align:left;font-size:13px}
+  table.res th{background:var(--panel2);color:var(--muted)}
+  .bar{height:10px;background:#e3e8ec;border-radius:5px;overflow:hidden;min-width:80px}
+  .bar > i{display:block;height:100%;background:var(--accent);}
+  .resq{border:1px solid var(--border);border-radius:4px;padding:10px;margin:6px 0;background:var(--panel)}
+  .resq.correct{border-left:4px solid var(--ok)}
+  .resq.wrong{border-left:4px solid var(--ng)}
+  .badge{font-size:11px;padding:1px 7px;border-radius:10px;font-weight:500}
+  .badge.ok{background:#e3f2e9;color:#1e6b3f} .badge.ng{background:#fbe7e4;color:#9a2c20}
+  .elem{display:flex;justify-content:space-between;gap:8px;padding:5px 8px;border-radius:3px;margin:3px 0;background:var(--panel2);font-size:13px}
+  .elem.got{border-left:3px solid var(--ok)} .elem.miss{border-left:3px solid var(--ng)}
+  .unsaved{color:#b06a00;font-size:11px}
+  .small{font-size:12px;color:var(--muted)}
+  a{color:var(--link)}
+  .accordion{cursor:pointer;user-select:none;color:var(--accent2);font-weight:500;margin-top:14px}
+  details.revdev{margin:6px 0;border:1px solid var(--border);border-radius:4px;background:var(--panel2)}
+  details.revdev>summary{cursor:pointer;padding:6px 10px;font-weight:500;color:var(--accent2)}
+  .revh{font-size:11px;color:var(--muted);margin:6px 10px 2px}
+  .revh.ok{color:var(--ok)}
+  .revgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  @media(max-width:760px){ .revgrid{grid-template-columns:1fr} }
+  pre.rev{background:#f3f4f6;border:1px solid var(--border);border-radius:4px;padding:8px;margin:2px 10px 8px;overflow:auto;font-family:Consolas,monospace;font-size:12px;color:#20242a;white-space:pre-wrap}
+
+  /* ===== 受講者向け成績PDF（print-to-PDF・出力専用・採点ロジック不変） v1.1純加算 ===== */
+  #printRoot{display:none}
+  .pf-h1{font-size:20px;font-weight:700;margin:0 0 6px;color:#000}
+  .pf-h2{font-size:14px;font-weight:700;margin:14px 0 5px;border-bottom:2px solid #000;padding-bottom:2px;color:#000}
+  .pf-h3{font-size:12px;font-weight:700;margin:8px 0 3px;color:#000}
+  .pf-h4{font-size:11px;font-weight:700;margin:7px 0 2px;color:#000}
+  .pf-meta{font-size:11px;margin:2px 0;color:#000}
+  .pf-big{font-size:30px;font-weight:800;line-height:1.1}
+  .pf-pass{color:#137333} .pf-fail{color:#b3261e}
+  table.pf{width:100%;border-collapse:collapse;margin:4px 0}
+  table.pf th,table.pf td{border:1px solid #666;padding:3px 6px;text-align:left;font-size:10px;color:#000;vertical-align:top}
+  table.pf th{background:#e8e8e8}
+  .pf-got{color:#137333} .pf-miss{color:#b3261e;font-weight:700}
+  .pf-badge{font-size:9px;font-weight:700;padding:1px 5px;border:1px solid #666;border-radius:3px}
+  .pf-badge.ok{color:#137333;border-color:#137333} .pf-badge.ng{color:#b3261e;border-color:#b3261e} .pf-badge.na{color:#555}
+  pre.pf{border:1px solid #999;background:#f6f6f6;padding:4px 6px;font-family:Consolas,monospace;font-size:9px;white-space:pre-wrap;margin:2px 0;color:#000}
+  .pf-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .pf-note{font-size:9px;color:#444;margin-top:3px}
+  .pf-q{border:1px solid #999;border-radius:3px;padding:5px 7px;margin:4px 0}
+  .pf-q.correct{border-left:4px solid #137333} .pf-q.wrong{border-left:4px solid #b3261e}
+  @media print{
+    body{background:#fff;color:#000}
+    body > *{display:none !important}
+    #printRoot{display:block !important}
+    #printRoot,#printRoot *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    .pf-page{page-break-after:always}
+    .pf-page:last-child{page-break-after:auto}
+    .pf-avoid{page-break-inside:avoid}
+    .pf-grid{grid-template-columns:1fr 1fr}
+  }
+</style>
+</head>
+<body>
+
+<!-- ====== データ埋め込み(結合スクリプトで注入) ====== -->
+<script type="application/json" id="select-data">[
+  {
+    "id": "P11-004",
+    "domain": "IPSvc",
+    "rank": "C",
+    "type": "single",
+    "question": "トラフィックシェーピングの目的は何ですか。",
+    "choices": [
+      "ベストエフォート型のサービスを提供します",
+      "動的なフロー識別を可能にします",
+      "帯域幅の使用を制限します",
+      "ポリシーベースのルーティングを可能にします"
+    ],
+    "answerHash": "78b053d08451b7e4c61fe97be06a34969ef33b3fe2de2e25fcf75411e053d945",
+    "explanation": "",
+    "source": "出典: Part11 問4"
+  },
+  {
+    "id": "P11-043",
+    "domain": "NF",
+    "rank": "B",
+    "type": "single",
+    "question": "どの種類のIPv4アドレスが、グローバルに一意なアドレスクラスを節約するのに役立ちますか。",
+    "choices": [
+      "プライベート",
+      "マルチキャスト",
+      "パブリック",
+      "ループバック"
+    ],
+    "answerHash": "f9ee9e2c89eabe0d50157a4324e42cb3dbf6336b7e4dc9626e35336cd806c8f4",
+    "explanation": "",
+    "source": "出典: Part11 問43"
+  },
+  {
+    "id": "P11-048",
+    "domain": "IPConn",
+    "rank": "B",
+    "type": "single",
+    "question": "192.168.12.16 へのトラフィックをどのように管理しますか。",
+    "choices": [
+      "管理距離が最も短い EIGRP ルートを選択します",
+      "宛先アドレスを含むプレフィックスが最も長い OSPF ルートを選択します",
+      "宛先アドレスを含むプレフィックスが最も長い RIP ルートを選択します",
+      "3つのルート間でトラフィックの負荷を分散します"
+    ],
+    "answerHash": "b36956e822a9f6ca4d42ce38bf9a46e9f7f5d03f365d31fb54d1aeb585d103bd",
+    "explanation": "",
+    "source": "出典: Part11 問48"
+  },
+  {
+    "id": "P11-050",
+    "domain": "IPConn",
+    "rank": "A",
+    "type": "single",
+    "question": "現在のデフォルトルートが失敗したときだけ有効になるフローティングスタティックルートを設定する必要があります。そのルートは 2001:db8:1234:2::1 を指すように設定します。CPEでどのコマンドを設定しますか。\n\n```\nCPE# show ipv6 route\nIPv6 Routing Table - default - 6 entries\nND ::/0 [2/0]\n   via FE80::A8BB:CCFF:FE00:200, Ethernet0/0\nNDp 2001:DB8:1234:1::/64 [2/0]\n   via Ethernet0/0, directly connected\nL 2001:DB8:1234:1:A8BB:CCFF:FE00:100/128 [0/0]\n   via Ethernet0/0, receive\nC 2001:DB8:1234:2::/64 [0/0]\n   via Ethernet0/1, directly connected\nL 2001:DB8:1234:2:A8BB:CCFF:FE00:110/128 [0/0]\n   via Ethernet0/1, receive\nL FF00::/8 [0/0]\n via Null0, receive\n```",
+    "choices": [
+      "ipv6 route ::/128 2001:db8:1234:2::1 3",
+      "ipv6 route ::/0 2001:db8:1234:2::1 1",
+      "ipv6 route ::/0 2001:db8:1234:2::1 3",
+      "ipv6 route ::/0 2001:db8:1234:2::1 2"
+    ],
+    "answerHash": "11b444c28a384f10cb6c666e8d4bdd82faa40d6ac09653884f31b67d59061e99",
+    "explanation": "",
+    "source": "出典: Part11 問50"
+  },
+  {
+    "id": "P11-053",
+    "domain": "NA",
+    "rank": "A",
+    "type": "single",
+    "question": "2つのスイッチが実装されており、すべてのインターフェイスはデフォルトの構成レベルにあります。2つのスイッチ間にトランク リンクを実装するには、次の要件を満たす必要があります。相互接続ポートはどのように構成しますか。",
+    "choices": [
+      "switchport mode dynamic ／ channel-protocol lacp ／ switchport trunk allowed vlans 1-10",
+      "switchport mode trunk ／ switchport trunk encapsulation dot1q ／ switchport trunk allowed vlans 1-10",
+      "switchport mode dynamic desirable ／ channel-group 1 mode desirable ／ switchport trunk encapsulation isl ／ switchport trunk allowed vlan except 11-4094",
+      "switchport mode trunk ／ switchport trunk allowed vlans 1-10 ／ switchport trunk native vlan 11"
+    ],
+    "answerHash": "565b0472edebb0a0a817c420e0948d25766e02ad9d0788bfbf938442603c0322",
+    "explanation": "",
+    "source": "出典: Part11 問53"
+  },
+  {
+    "id": "P11-061",
+    "domain": "NA",
+    "rank": "B",
+    "type": "single",
+    "question": "WLCのどのインターフェイスまたはポートが、インバンドデバイス管理およびコントローラとアクセスポイント間の通信のデフォルトですか。",
+    "choices": [
+      "マネジメントインターフェース",
+      "サービスポート",
+      "仮想インターフェース",
+      "コンソールポート"
+    ],
+    "answerHash": "63670a5015945de31dec7a848f370c11955df396f63d554c3f3330baee1ac8ce",
+    "explanation": "",
+    "source": "出典: Part11 問61"
+  },
+  {
+    "id": "P11-070",
+    "domain": "IPConn",
+    "rank": "A",
+    "type": "single",
+    "question": "172.31.0.1 宛てにパケットを送信します。ルーティング テーブルに、172.31.0.0/16、172.31.0.0/24、172.31.0.0/25 の3つがあるとき、ルーターはどのように処理しますか。",
+    "choices": [
+      "172.31.0.0/16 経由で送信されます",
+      "172.31.0.0/24 経由で送信されます",
+      "172.31.0.0/25 経由で送信されます",
+      "デフォルト ゲートウェイ 0.0.0.0/0 経由で送信されます"
+    ],
+    "answerHash": "45f00a9214a03670f6f5012a91098026d996938ecb5ad0fea8cb49c75dae1ac1",
+    "explanation": "",
+    "source": "出典: Part11 問70"
+  },
+  {
+    "id": "P11-074",
+    "domain": "NF",
+    "rank": "C",
+    "type": "single",
+    "question": "セキュリティドメインによってネットワークを分離するデバイスはどれですか。",
+    "choices": [
+      "ワイヤレスコントローラ",
+      "ファイアウォール",
+      "侵入防止システム",
+      "アクセスポイント"
+    ],
+    "answerHash": "205977548c15c3be682629dcbc95532def4642c5db9ad45f021838a311a5006f",
+    "explanation": "",
+    "source": "出典: Part11 問74"
+  },
+  {
+    "id": "P11-077",
+    "domain": "NF",
+    "rank": "A",
+    "type": "single",
+    "question": "パケットの宛先は 172.16.3.254 です。宛先ルートのサブネットマスクはどれですか。\n\n```\nGateway of last resort is 172.16.2.2 to network 0.0.0.0\n   10.0.0.0/8 is variably subnetted, 2 subnets, 2 masks\nC    10.10.10.0/24 is directly connected, GigabitEthernet0/0/0\nL    10.10.10.3/32 is directly connected, GigabitEthernet0/0/0\n   172.16.0.0/16 is variably subnetted, 3 subnets, 2 masks\nS    172.16.1.33/32 is directly connected, GigabitEthernet0/0/1\nC    172.16.2.0/23 is directly connected, GigabitEthernet0/0/1\nL    172.16.2.1/32 is directly connected, GigabitEthernet0/0/1\nS* 0.0.0.0/0 [1/0] via 172.16.2.2\n```",
+    "choices": [
+      "255.255.255.255",
+      "0.0.0.0",
+      "255.255.254.0",
+      "255.255.255.0"
+    ],
+    "answerHash": "6d85a656c8666de723fc4a695f1199d9c9bd7daba1c3cf339be6f1144950963f",
+    "explanation": "",
+    "source": "出典: Part11 問77"
+  },
+  {
+    "id": "P11-078",
+    "domain": "NA",
+    "rank": "B",
+    "type": "single",
+    "question": "Rapid PVST+ の共有 LAN セグメント上のバックアップポートの動作モードと役割は何ですか。",
+    "choices": [
+      "リスニングモードはルートブリッジへの代替パスを提供します",
+      "ブロッキングモードは指定ブリッジへの代替パスを提供します",
+      "転送モードは各VLANのルートブリッジへの最低コストパスを提供します",
+      "学習モードはLANから離れたトラフィックを処理するルートブリッジへの最短パスを提供します"
+    ],
+    "answerHash": "2c39a873489810bf9aa2a3e56bfc3496316e9a7a878d691853ab7ed42cb62415",
+    "explanation": "",
+    "source": "出典: Part11 問78"
+  },
+  {
+    "id": "P11-080",
+    "domain": "NA",
+    "rank": "C",
+    "type": "single",
+    "question": "スイッチが宛先が不明な MAC アドレスであるフレームを受信すると何が起こりますか。",
+    "choices": [
+      "スイッチのMACアドレステーブルはフラッシュされます。",
+      "フレームは、そのフレームが属するVLAN内のすべてのインターフェースにフラッディングされます。",
+      "フレームは破棄されます",
+      "フレームはスイッチ内のすべてのインターフェースにフラッディングされます。"
+    ],
+    "answerHash": "c22a0e5ce115a32ac4300a8c83c968046c37d800476bf075e8365f9072f82f6e",
+    "explanation": "",
+    "source": "出典: Part11 問80"
+  },
+  {
+    "id": "P12-014",
+    "domain": "NA",
+    "rank": "A",
+    "type": "single",
+    "question": "新しいWLANを構成しており、認証には RADIUS サーバーの代わりにセットアップ パスワードを使用します。どの追加タスクセットを実行しますか。",
+    "choices": [
+      "WPA Policy ／ CCKM–Enable ／ PSK–Enable",
+      "PMF–Disabled ／ PSK–Enable ／ 802.1x–Enable",
+      "WPA Policy ／ WPA2 Policy ／ FT PSK–Enable",
+      "WPA2 Policy ／ PMF–Disabled ／ PSK–Enable"
+    ],
+    "answerHash": "2a90cbb5816f2be90dbedd864a5da6e24dd0c7274ca0d6f5b50b3a8f038fa8e4",
+    "explanation": "",
+    "source": "出典: Part12 問14"
+  },
+  {
+    "id": "P12-015",
+    "domain": "IPSvc",
+    "rank": "A",
+    "type": "multi",
+    "question": "SW1のリモート管理アクセスを安全で暗号化されたものに更新したい。スイッチに適用する必要がある コマンドはどれか。（2つ選択）\n\n```\nSW1#show run\nBuilding configuration...\n!\nhostname SW1\n!\nip domain-name test\n!\nusername CCNA privilege 1 password 0 cisco123\n!\ninterface FastEthernet0/1\n switchport access vlan 10\n!\ninterface Vlan10\n ip address 192.168.1.2 255.255.255.0\n!\nline vty 0 4\n login local\n transport input telnet\nline vty 5 15\n login local\n transport input telnet\n\nSW1#show crypto key mypubkey rsa\n% Key pair was generated at: 0:1:23 UTC Mar 1 2021\nKey name: SW1.test\n```",
+    "choices": [
+      "SW1(config)# interface f0/1 ／ SW1(config-if)# switch port mode trunk",
+      "SW1(config)# username NEW secret R3mote123",
+      "SW1(config)#line vty 0 15 ／ SW1(config-line)#transport input ssh",
+      "SW1(config)#enable secret ccnaTest123",
+      "SW1(config)# crypto key generate rsa"
+    ],
+    "answerHash": "bd703491b18dacc4fdd71118521ba81d6be08aa6d0d18fb07ffde675d1eb44e6",
+    "explanation": "",
+    "source": "出典: Part12 問15"
+  },
+  {
+    "id": "P12-028",
+    "domain": "Auto",
+    "rank": "C",
+    "type": "multi",
+    "question": "ソフトウェア定義ネットワークには、どのノースバウンド API がありますか。（2つ選択）",
+    "choices": [
+      "NETCONF",
+      "OpFlex",
+      "OpenFlow",
+      "REST",
+      "SOAP"
+    ],
+    "answerHash": "818c48cb72b3d519400d476b897767fe02ca2fd98d1ea19972b0c1d5e713d733",
+    "explanation": "",
+    "source": "出典: Part12 問28"
+  },
+  {
+    "id": "P12-029",
+    "domain": "NF",
+    "rank": "B",
+    "type": "single",
+    "question": "異なるホストにあるアプリケーションにデータを転送するために HTTP メッセージを使用するものは何ですか。",
+    "choices": [
+      "REST",
+      "OpenFlow",
+      "OpFlex",
+      "OpenStack"
+    ],
+    "answerHash": "4d8eabd3aec26c2ff438fb77d4f574fec0979025b054a6a95048a9c69a5dafdd",
+    "explanation": "",
+    "source": "出典: Part12 問29"
+  },
+  {
+    "id": "P12-038",
+    "domain": "NA",
+    "rank": "A",
+    "type": "single",
+    "question": "新しいスイッチのインターフェイスを、Cat9300-1 の Gi1/0/1 に接続するように設定します。どの設定を適用しますか。\n\n```\nCat9300-1# show interface g1/0/1 switchport\nName: Gi1/0/1\nSwitchport: Enabled\nAdministrative Mode: trunk\nOperational Mode: trunk\nAdministrative Trunking Encapsulation: dot1q\nOperational Trunking Encapsulation: dot1q\nNegotiation of Trunking: On\nAccess Mode VLAN: 1 (default)\nTrunking Native Mode VLAN: 321 (VLAN0321)\nAdministrative Native VLAN tagging: enabled\nTrunking VLANs Enabled: 100,200,300\nPruning VLANs Enabled: 2-1001\n```",
+    "choices": [
+      "switchport mode dynamic desirable ／ switchport trunk native vlan 321 ／ switchport trunk allowed vlan 100,200,300",
+      "switchport nonegotiate ／ switchport access vlan 321 ／ switchport trunk allowed vlan except 2-1001",
+      "switchport trunk encapsulation dot1q ／ switchport trunk native vlan 321 ／ switchport trunk allowed vlan 100-300",
+      "switchport mode trunk ／ switchport trunk native vlan 321 ／ switchport trunk allowed vlan 100,200,300"
+    ],
+    "answerHash": "4b8864238562d550aac7e6f60bf6db46a617678786d7806e836119a30ace0e4c",
+    "explanation": "",
+    "source": "出典: Part12 問38"
+  },
+  {
+    "id": "P12-049",
+    "domain": "IPConn",
+    "rank": "A",
+    "type": "single",
+    "question": "Cisco のエンジニアは、2 つの OSPF ネイバーがクロスオーバー イーサネット ケーブルを使用して接続されていることに気付きました。ネイバーが完全に隣接状態になるまでに時間がかかりすぎています。隣接状態がFULL 状態になるまでの時間を短縮するには、各ルータのインターフェイス設定でどのコマンドを発行しますか。",
+    "choices": [
+      "ip ospf dead-interval 40",
+      "ip ospf priority 0",
+      "ip ospf network broadcast",
+      "ip ospf network point-to-point"
+    ],
+    "answerHash": "8b0378a40f973afbca3fe89f59f945fabf715285fae686c2520819beeed696e9",
+    "explanation": "",
+    "source": "出典: Part12 問49"
+  },
+  {
+    "id": "P12-052",
+    "domain": "Sec",
+    "rank": "B",
+    "type": "multi",
+    "question": "WPA2 と WPA3 のワイヤレス セキュリティの違いは何ですか（2つ選択）。",
+    "choices": [
+      "WPA3 は、TKIP を使用する WPA2 よりも強力な保護のために AES を使用します。",
+      "WPA3 は、AES を使用する WPA2 よりも強力な保護のために SAE を使用します。",
+      "WPA3 は、SAE を使用する WPA2 よりも強力な保護のために AES を使用します。",
+      "WPA2 は 128 ビットのキー暗号化を使用し、WPA3 は 128 ビットと 192 ビットのキー暗号化をサポートします",
+      "WPA2 は 192 ビットのキー暗号化を使用し、WPA3 は 256 ビットのキー暗号化を必要とします。"
+    ],
+    "answerHash": "d10c19322d9072993cfbdbc99c5dff5632d90f3e2faa5bd71df2f41d295609cc",
+    "explanation": "",
+    "source": "出典: Part12 問52"
+  },
+  {
+    "id": "P12-060",
+    "domain": "IPConn",
+    "rank": "B",
+    "type": "single",
+    "question": "負荷分散されたトラフィックが WAN から 172.16.1.190 のホスト宛てに送信されています。ルータはどのネクストホップを使用して要求を転送しますか。\n\n```\nR1# show ip route\nGateway of last resort is not set\nC 172.16.0.0/16 is directly connected, Loopback0\n   172.16.0/16 is variably subnetted, 4 subnets, 2 masks\nO    172.16.1.3/3 [110/100] via 192.168.7.40, 00:39:08, Serial0\nC    172.16.1.0/24 is directly connected, Serial0\nO    172.16.1.184/29 [110/5] via 192.168.7.35, 00:39:08, Serial0\nO    172.16.3.0/24 [110/10] via 192.168.7.4, 00:39:08, GigabitEthernet 0/0\nD    172.16.1.0/28 [90/10] via 192.168.7.7, 00:39:08, GigabitEthernet 0/0\n```",
+    "choices": [
+      "192.168.7.4",
+      "192.168.7.7",
+      "192.168.7.35",
+      "192.168.7.40"
+    ],
+    "answerHash": "b79fd5bebe2f12f093256d03aa949f52f19d08addd0db84eec777ce897a872aa",
+    "explanation": "",
+    "source": "出典: Part12 問60"
+  },
+  {
+    "id": "P12-068",
+    "domain": "NA",
+    "rank": "B",
+    "type": "multi",
+    "question": "Cisco WLC がアウトオブバンド管理に使用するポートタイプは何ですか。（2つ選択）",
+    "choices": [
+      "マネジメント",
+      "ディストリビューション",
+      "コンソール",
+      "冗長",
+      "サービス"
+    ],
+    "answerHash": "c523c001167299c89e54a947a1e41e5d924bb23afd6d39a43c4052fa705c15ee",
+    "explanation": "",
+    "source": "出典: Part12 問68"
+  },
+  {
+    "id": "P12-072",
+    "domain": "IPConn",
+    "rank": "C",
+    "type": "single",
+    "question": "マルチベンダー環境で新しいサブネットを構成するとき、なぜVRRP を実装しますか。",
+    "choices": [
+      "ゲートウェイへのスパニングツリー転送パスがループフリーであることを保証するため",
+      "ホスト ARP キャッシュの変更を必要とせずに、メンバー障害後も通常の操作を続行できるようにするため",
+      "すべてのベンダーと正常に相互運用し、Cisco デバイスに追加のセキュリティ機能を提供するため",
+      "冗長性のために 2 台以上の Cisco デバイスをサポートするゲートウェイ プロトコルが必要な場合"
+    ],
+    "answerHash": "7de0bb65ff577b7a6c562719f77653f2c7b80cd1c0b266b80a098e679858f3a4",
+    "explanation": "",
+    "source": "出典: Part12 問72"
+  },
+  {
+    "id": "P12-075",
+    "domain": "Auto",
+    "rank": "C",
+    "type": "multi",
+    "question": "コントローラ ベースのアーキテクチャを実装する利点は何ですか。（2つ選択）",
+    "choices": [
+      "構成タスクの自動化が可能になります。",
+      "仮想マシンへのシームレスな接続が可能になります。",
+      "拡張性と管理オプションが向上します。",
+      "サービス拒否攻撃に対するセキュリティが強化されます。",
+      "複雑で大規模な IP アドレス指定スキームをサポートします。"
+    ],
+    "answerHash": "18cbbb70451a53a7e5df619306d24af8a2f928355a46242fc376a57f4fa23d00",
+    "explanation": "",
+    "source": "出典: Part12 問75"
+  },
+  {
+    "id": "P12-095",
+    "domain": "NF",
+    "rank": "A",
+    "type": "single",
+    "question": "どのようなインターフェース状態ですか。\n\n```\nR17# show interface fa0/0\nFastEthernet0/0 is up, line protocol is up\nDescription: chicago_subnet\nInternet address is 10.32.102.2/30\nreliability 255/255, txload 255/255, rxload 255/255\nFull-duplex, 100 Mb/s, 100BaseTX/FX\n30 second input rate 201240151 bits/sec, 0 packets/sec\n30 second output rate 228594263 bits/sec, 0 packets/sec\n1876 runts, 0 giants, 0 throttles\n0 input errors, 0 CRC, 0 frame, 0 overrun, 0 ignored\n0 output errors, 0 collisions, 0 interface resets\n```",
+    "choices": [
+      "ブロードキャスト ストーム",
+      "不良 NIC",
+      "キューイング",
+      "高いスループット"
+    ],
+    "answerHash": "6639048ee48d2701679ede7d05c1fc32b032d7e3576041268901dbe240e709d3",
+    "explanation": "",
+    "source": "出典: Part12 問95"
+  },
+  {
+    "id": "P12-102",
+    "domain": "Auto",
+    "rank": "C",
+    "type": "single",
+    "question": "Cisco DNA Center は従来のキャンパス管理に比べてどのような利点がありますか。",
+    "choices": [
+      "Cisco DNA Center は API を活用し、従来のキャンパス管理では手動でのデータ収集が必要です。",
+      "Cisco DNA Center は暗号化されたエントリの SSH アクセスを自動化しますが、従来のキャンパス管理ではSSH は使用されません。",
+      "Cisco DNA Center は暗号化された管理に SNMPv3 を活用し、従来のキャンパス管理では SNMPv2 を使用します。",
+      "Cisco DNA Center は安全な Web アクセスのために HTTPS を自動化しますが、従来のキャンパス管理ではHTTP を使用します。"
+    ],
+    "answerHash": "49036e5212539603011b973341d477f7715b10e96558d2945878bdc66f48e13a",
+    "explanation": "",
+    "source": "出典: Part12 問102"
+  },
+  {
+    "id": "P12-110",
+    "domain": "IPSvc",
+    "rank": "A",
+    "type": "single",
+    "question": "ローカルのユーザー名とパスワードを使用して、Telnet経由で直接特権モードにアクセスできるようにするには、どの追加構成を適用しますか？\n\nオプション選択肢（A〜D）は本文に記載。前提設定:\n```\nSwitch(config)#hostname R1\nR1(config)#interface FastEthernet0/1\nR1(config-if)#no switchport\nR1(config-if)#ip address 10.100.20.42 255.255.255.0\nR1(config-if)#exit\nR1(config)#line vty 0 4\nR1(config-line)#login\n```",
+    "choices": [
+      "R1(config)#username admin ／ line vty 0 4 ／ password p@ss1234 ／ transport input telnet",
+      "R1(config)#username admin privilege 15 secret p@ss1234 ／ line vty 0 4 ／ login local",
+      "R1(config)#username admin secret p@ss1234 ／ line vty 0 4 ／ login local ／ enable secret p@ss1234",
+      "R1(config)#username admin ／ line vty 0 4 ／ password p@ss1234"
+    ],
+    "answerHash": "9427d566584970077d74c7c6510b42c3ed85e0207b831a6a7c12adb6917e366f",
+    "explanation": "",
+    "source": "出典: Part12 問110"
+  },
+  {
+    "id": "P13-007",
+    "domain": "NF",
+    "rank": "B",
+    "type": "multi",
+    "question": "REST ベースの API によって実行されるアクションに適した HTTP メソッドはどれですか。（2つ選択）",
+    "choices": [
+      "POST",
+      "POP",
+      "REDIRECT",
+      "REMOVE",
+      "GET"
+    ],
+    "answerHash": "8446becb5b4b8cae34d44f66df1a05fdd3c46842ed1940407e4eac29e7921970",
+    "explanation": "",
+    "source": "出典: Part13 問7"
+  },
+  {
+    "id": "P13-013",
+    "domain": "Sec",
+    "rank": "C",
+    "type": "single",
+    "question": "WPA3 に実装された拡張機能とは何ですか。",
+    "choices": [
+      "認証解除攻撃と関連付け解除攻撃から防御する",
+      "TKIP とパケットごとのキーイングを使用する",
+      "802.1x 認証と AES-128 暗号化を適用する",
+      "アクセスポイントを識別するために PKI と RADIUS を採用する"
+    ],
+    "answerHash": "78196fbda0de9659e7d69e5d552f7d8af7567c8ef644cf1637987cad2348b8cf",
+    "explanation": "",
+    "source": "出典: Part13 問13"
+  },
+  {
+    "id": "P13-021",
+    "domain": "Auto",
+    "rank": "B",
+    "type": "single",
+    "question": "SDN ネットワーク内でコントロールプレーンとデータプレーンを分離する利点は何ですか。",
+    "choices": [
+      "ネットワーク全体の複雑さを軽減する",
+      "データクエリをコントロールプレーンに制限する",
+      "コストを削減する",
+      "仮想マシンの作成をデータプレーンにオフロードする"
+    ],
+    "answerHash": "ce54d689906653eda5ddf3f516863662dda9bd433413cabc5aa35cd665c1672b",
+    "explanation": "",
+    "source": "出典: Part13 問21"
+  },
+  {
+    "id": "P13-032",
+    "domain": "IPConn",
+    "rank": "A",
+    "type": "single",
+    "question": "10.200.0.2 経路のフローティングスタティックルートを設定します。",
+    "choices": [
+      "ip route 0.0.0.0 0.0.0.0 10.200.0.2 1",
+      "ip route 0.0.0.0 0.0.0.0 10.200.0.2",
+      "ip route 0.0.0.0 0.0.0.0 10.200.0.2 10",
+      "ip route 0.0.0.0 0.0.0.0 10.200.0.2 floating"
+    ],
+    "answerHash": "2262fec52d863e4908e75f01ee639f24a2ae082f551b25d9cd2f4b3939d69cf5",
+    "explanation": "",
+    "source": "出典: Part13 問32"
+  },
+  {
+    "id": "P13-040",
+    "domain": "Auto",
+    "rank": "B",
+    "type": "single",
+    "question": "この JSON スキーマ内の単語「ge3/36」は何を表していますか。\n\n出力context:\n```\n1 [\n2 {\"VPN concentrator\": \"VPN36\", \"interface\":\"ge3/36\"},\n3 {\"load balancer\": \"LB33\", \"interface\":\"te7/10\"},\n4 {\"switch\": \"SW31\", \"interface\":\"fe2/25\"},\n5 ]\n```",
+    "choices": [
+      "キー",
+      "値",
+      "配列",
+      "オブジェクト"
+    ],
+    "answerHash": "acc72c770037fb0a3076db5c997167be2e2b54c5250f289888a33c0a2d04ba9d",
+    "explanation": "",
+    "source": "出典: Part13 問40"
+  },
+  {
+    "id": "P13-044",
+    "domain": "IPConn",
+    "rank": "A",
+    "type": "single",
+    "question": "宛先ネットワークにトラフィックを送信するために使用されるインターフェースはどれですか。\n\n出力context:\n```\nD 10.214.247.237/28 [90/2170] via G0/12\nD 10.214.247.237/28 [90/46985] via G0/19\nO 10.214.247.237/28 [110/665] via G0/9\nO 10.214.247.237/28 [110/3399] via G0/1\n```",
+    "choices": [
+      "G0/12",
+      "G0/9",
+      "G0/1",
+      "G0/19"
+    ],
+    "answerHash": "2d1b91730debab738569a0995d2abb9abcf4e6e8f428ca341c026bda35563d21",
+    "explanation": "",
+    "source": "出典: Part13 問44"
+  },
+  {
+    "id": "P13-045",
+    "domain": "IPConn",
+    "rank": "A",
+    "type": "single",
+    "question": "宛先ネットワークにトラフィックを送信するために使用されるインターフェースはどれですか。\n\n出力context:\n```\nO 10.139.120.253/29 [110/9443] via G0/20\nO 10.139.120.253/29 [110/29560] via G0/16\nR 10.139.120.253/29 [120/12] via G0/11\nR 10.139120 253/29 [120/6] via G0/9\n```",
+    "choices": [
+      "G0/11",
+      "G0/16",
+      "G0/20",
+      "G0/9"
+    ],
+    "answerHash": "c393f9486fcb8c49f4ecabfc736bb837356bd1c459df2a60659b01ec0ec7dd6e",
+    "explanation": "",
+    "source": "出典: Part13 問45"
+  },
+  {
+    "id": "P13-048",
+    "domain": "NA",
+    "rank": "B",
+    "type": "single",
+    "question": "P2P Blocking Action オプションは無効になっています。キャンパス内をクライアントが移動するときに、各クライアントが割り当てられた IP アドレスを保持するための設定はどれですか？",
+    "choices": [
+      "Static IP Tunneling オプションを有効にする",
+      "Coverage Hole Detection オプションを無効にする",
+      "P2P Blocking Actionオプションを Forward-Up Stream に設定する",
+      "DHCP Addr. Assignment チェックボックスをオンにする"
+    ],
+    "answerHash": "6a562640688e9ac5481433fc588860b07dfe30bd15935dd1982833592bab998e",
+    "explanation": "",
+    "source": "出典: Part13 問48"
+  },
+  {
+    "id": "P13-076",
+    "domain": "IPSvc",
+    "rank": "C",
+    "type": "single",
+    "question": "トラフィック・シェーピングとは何ですか。",
+    "choices": [
+      "トラフィックをクラスに整理する",
+      "パケット内に QoS 属性を設定する",
+      "過剰なトラフィックをキューに入れる",
+      "パケットの QoS 属性を変更する"
+    ],
+    "answerHash": "2af46b752f613a9ce6c7865e2194efe58e913e72c491078a55c6cd9112151fbe",
+    "explanation": "",
+    "source": "出典: Part13 問76"
+  },
+  {
+    "id": "P13-083",
+    "domain": "IPSvc",
+    "rank": "A",
+    "type": "multi",
+    "question": "管理者は、203.0.113.0/24 ネットワーク内のホストからの管理接続のみを受け入れるように Cisco Catalyst スイッチを設定しています。スイッチを通過するその他のトラフィックは中断することなく通過する必要があります。エンジニアはどの2つの設定をルータに適用しますか。（2つ選択）",
+    "choices": [
+      "ip access-list extended Management ／ permit tcp any range 22 23 203.0.113.0 0.0.0.255",
+      "interface range vlan 1 – 4094 ／ ip access-group Management out",
+      "ip access-list standard Management ／ permit 203.0.113.0 255.255.255.0",
+      "line vty 0 15 ／ access-class Management in",
+      "ip access-list standard Management ／ permit 203.0.113.0 0.0.0.255"
+    ],
+    "answerHash": "45e20953a4d6975abcd00815c68950e8f1ef8b798837a5b2c8f470b306d87f05",
+    "explanation": "",
+    "source": "出典: Part13 問83"
+  },
+  {
+    "id": "P14-001",
+    "domain": "NF",
+    "rank": "C",
+    "type": "single",
+    "question": "ネットワーク管理者は、syslog サーバーが受信メッセージを重要度に応じて異なるファイルにフィルタリングすることを望んでいます。どのフィルタリング基準を使用しますか。",
+    "choices": [
+      "機能",
+      "レベル",
+      "プロセス ID",
+      "メッセージ本文"
+    ],
+    "answerHash": "4c179131d1ca53eb1866ce0ed2eee443d7d66f48e7668c045ebde247cb656f4b",
+    "explanation": "",
+    "source": "出典: Part14 問1"
+  },
+  {
+    "id": "P14-005",
+    "domain": "NA",
+    "rank": "B",
+    "type": "single",
+    "question": "どのスイッチがルートブリッジになりますか。",
+    "choices": [
+      "SW1（Bridge Priority – 28672 ／ mac-address 00:10:a1:51:57:51）",
+      "SW3（Bridge Priority – 12288 ／ mac-address 00:10:a1:95:2b:77）",
+      "SW2（Bridge Priority – 28672 ／ mac-address 00:10:a1:82:03:94）",
+      "SW4（Bridge Priority – 12288 ／ mac-address 00:10:a1:03:42:e8）"
+    ],
+    "answerHash": "127800315823adcd0043f306f085e5cb8ae4a033bf587651d8aaf5f124e870c5",
+    "explanation": "",
+    "source": "出典: Part14 問5"
+  },
+  {
+    "id": "P14-013",
+    "domain": "IPConn",
+    "rank": "S",
+    "type": "single",
+    "question": "パケットは 192.168.10.1 から 192.168.20.75 の宛先に流れています。ルータはどのネクストホップを選択しますか。\n\n出力context:\n```\nR_1# show ip route\n     .....\nD    192.168.20.0/26 [90/24513456] via 10.10.10.1\nR    192.168.20.0/24 [120/5] via 10.10.10.2\nO    192.168.0.0/19 [110/219414] via 10.10.10.13\nB    192.168.0.0/16 is variably subnetted, 4 subnets,4 masks\nD    192.168.20.0/27 [90/4123710] via 10.10.10.12\nD    192.168.20.0/25 [90/14464211] via 10.10.10.11\nS*   0.0.0.0/0 [1/0] via 10.10.10.14\n```",
+    "choices": [
+      "10.10.10.12",
+      "10.10.10.1",
+      "10.10.10.11",
+      "10.10.10.14"
+    ],
+    "answerHash": "c66c6ead56233d2c3b9df802ac766ca0d6b7136d9850754684e06b4d433052b5",
+    "explanation": "",
+    "source": "出典: Part14 問13"
+  },
+  {
+    "id": "P14-038",
+    "domain": "IPConn",
+    "rank": "A",
+    "type": "single",
+    "question": "宛先ネットワークにトラフィックを送信するために使用されるインターフェースはどれですか。\n\n出力context:\n```\nD 10.47.114.119/29 [90/6451] via F0/2\nD 10.47.114.119/29 [90/52201] via F0/20\nR 10.47.114.119/29 [120/9] via F0/12\nR 10.47.114.119/29 [120/10] via F0/10\n```",
+    "choices": [
+      "F0/10",
+      "F0/2",
+      "F0/20",
+      "F0/12"
+    ],
+    "answerHash": "b75aea6245fbe627e114d4c6c14454adf0878feab1fb906d8b1bcf993d76a80f",
+    "explanation": "",
+    "source": "出典: Part14 問38"
+  },
+  {
+    "id": "P14-048",
+    "domain": "IPConn",
+    "rank": "A",
+    "type": "single",
+    "question": "R1 が宛先 IP アドレス 10.56.0.62 のパケットを受信すると、どのインターフェイスを介してパケットをルーティングしますか。\n\n出力context:\n```\nR1#\nGateway of last resort is 10.56.0.1 to network 0.0.0.0\n\nS*   0.0.0.0/0 [1/0] via 10.56.0.1\n     10.0.0.0/8 is variably subnetted, 2 subnets, 2 masks\nC    10.56.0.0/16 is directly connected, Null0\nC    10.56.0.0/26 is directly connected, Vlan58\nC    10.56.0.0/17 is directly connected, Vlan59\nC    10.56.0.0/24 is directly connected, Vlan60\n```",
+    "choices": [
+      "Vlan60",
+      "Vlan58",
+      "Vlan59",
+      "Null0"
+    ],
+    "answerHash": "9f632744860157c807bed6bafbec59e0f3f3e08830e59fa07d3df9f4d7e57f7a",
+    "explanation": "",
+    "source": "出典: Part14 問48"
+  },
+  {
+    "id": "P14-064",
+    "domain": "Sec",
+    "rank": "C",
+    "type": "multi",
+    "question": "物理的なアクセス制御要素をサポートするタスクはどれですか。（2つ選択）",
+    "choices": [
+      "重要な場所へのバッジアクセスを実装する",
+      "企業のセキュリティポリシーに関するワークショップを実施する",
+      "組織の機密データを保護する方法に関する情報を配布する",
+      "新しいセキュリティ規制に関するスライドショーを作成する",
+      "ビデオ監視システムを導入する"
+    ],
+    "answerHash": "582c08738fd3573f4f36338a9d31caddc3b1c010132c81a9f3b2c74702874f8d",
+    "explanation": "",
+    "source": "出典: Part14 問64"
+  },
+  {
+    "id": "P14-066",
+    "domain": "NF",
+    "rank": "A",
+    "type": "single",
+    "question": "どのようなインターフェース状態ですか。\n\n出力context:\n```\nR9# show interface fa0/0\nFastEthernet0/0 is up, line protocol is up\nHardware is DEC21140, address is ca02.7788.0000 (bia ca02.7788.0000)\nDescription: atlanta_subnet\nInternet address is 10.32.102.2/30\nMTU 1500 bytes, BW 100000 Kbit/sec, DLY 100 usec,\nreliability 255/255, txload 1/255, rxload 1/255\nEncapsulation ARPA, loopback not set\nKeepalive set (60 sec)\nfull-duplex, 100 Mb/s, 100BaseTX/FX\nARP type: ARPA, ARP Timeout 04:00:00\nLast input 00:00:01, output 00:00:00, output hang never\nLast clearing of \"show interface\" counters 00:00:18\nInput queue: 175/300/0/0 (size/max/drops/flushes); Total output drops: 100\nQueueing strategy: fifo\nOutput queue: 50/300 (size/max)\n30 second input rate 0 bits/sec, 0 packets/sec\n30 second output rate 0 bits/sec, 0 packets/sec\n7331 packets input, 7101162 bytes\nReceived 267 broadcasts (0 IP multicasts)\n0 runts, 0 giants, 0 throttles\n0 input errors, 0 CRC, 0 frame, 0 overrun, 0 ignored\n3927 packets output, 1440403 bytes, 0 underruns\n0 output errors, 0 collisions, 0 interface resets\n```",
+    "choices": [
+      "ブロードキャストストーム",
+      "デュプレックスの不一致",
+      "不良 NIC",
+      "キューイング"
+    ],
+    "answerHash": "ac10dbf9f286b6a05e2f1fbfedf3b4fbb341eccb0c7de526273d2d3bde449653",
+    "explanation": "",
+    "source": "出典: Part14 問66"
+  },
+  {
+    "id": "P14-069",
+    "domain": "Sec",
+    "rank": "C",
+    "type": "single",
+    "question": "会社はすべてのシステムに多要素認証を要求することを決定しました。どのパラメータセットが要件を満たしていますか。",
+    "choices": [
+      "複雑なパスワードと個人の10桁の PIN",
+      "8文字から15文字のパスワードと個人の12桁の PIN",
+      "指紋スキャンと顔認識",
+      "個人の10桁の PIN と RSA 証明書"
+    ],
+    "answerHash": "a674dbf7c7d1f1b1138b16bffa0216ca5fc7d17938d02e8d5f0ba4bdc851af1c",
+    "explanation": "",
+    "source": "出典: Part14 問69"
+  },
+  {
+    "id": "P14-087",
+    "domain": "IPSvc",
+    "rank": "C",
+    "type": "single",
+    "question": "現在のリースの有効期限が切れた場合、クライアントはどのアドレスに連絡して IP アドレスを更新しますか。\n\n出力context:\n```\nwireless LAN adapter Wi-Fi\n   Connection-specific DNS Suffix  :\n   Description . . . . . . . . . . : Intel(R) dual Band wireless-AC 7265\n   Physical Address. . . . . . . . : C8-21-5B-B4-D3-E0\n   DHCP Enabled. . . . . . . . . . : YES\n   Autoconfiguration Enabled . . . : YES\n   Link-local IPv6 Address . . . . : fe80::45a1:b3fa:2f37:bf37%2(Preferred)\n   IPv4 Address. . . . . . . . . . : 192.168.25.103(Preferred)\n   Subnet Mask . . . . . . . . . . : 255.255.255.0\n   Lease Obtained. . . . . . . . . : June 11, 2019 10:21:31 AM\n   Lease Expires . . . . . . . . . : June 12, 2019 10:21:36 AM\n   Default Gateway . . . . . . . . : 192.168.25.1\n   DHCP Server . . . . . . . . . . : 192.168.25.100\n   DHCPV6 IAID . . . . . . . . . . : 46670168\n   DHCPv6 Client DUID. . . . . . . : 00-01-00-20-FF-05-55-3C-52-82-33-D3-84\n   DNS Servers . . . . . . . . . . : 192.168.25.254\n                                     192.168.25.254\n```",
+    "choices": [
+      "192.168.25.254",
+      "192.168.25.103",
+      "192.168.25.1",
+      "192.168.25.100"
+    ],
+    "answerHash": "712d06c3d0a7838471300c741ca660d00778466a542b5cc8791730ba98dd709f",
+    "explanation": "",
+    "source": "出典: Part14 問87"
+  },
+  {
+    "id": "P14-100",
+    "domain": "NF",
+    "rank": "B",
+    "type": "multi",
+    "question": "企業 NW 内でプライベート使用のために予約されているホストアドレスはどれか。（2つ選択）",
+    "choices": [
+      "12.17.1.20",
+      "172.15.2.250",
+      "172.31.255.100",
+      "192.169.32.10",
+      "10.172.76.200"
+    ],
+    "answerHash": "08a1d080238ccfff5da74e504ec8a1daf5addeb890faa801e5678b70fefebf02",
+    "explanation": "",
+    "source": "出典: Part14 問100"
+  },
+  {
+    "id": "P14-105",
+    "domain": "Sec",
+    "rank": "C",
+    "type": "multi",
+    "question": "認証とアカウンティングを区別する2つの文はどれですか。（2つ選択）",
+    "choices": [
+      "認証のみが「あなたが誰であるか」を検証します",
+      "認証のみが課金ユーザーにサポート情報を提供します。",
+      "認証のみがユーザーに資格情報を要求し、応答を返します。",
+      "認証のみがユーザーアクティビティ監査をサポートします。",
+      "認証のみがユーザーの接続期間を記録します。"
+    ],
+    "answerHash": "a3e9eb5cdb012face706d0de0667259628735f77ddd9c7fb2a64b98a0cf38506",
+    "explanation": "",
+    "source": "出典: Part14 問105"
+  },
+  {
+    "id": "P15-004",
+    "domain": "NF",
+    "rank": "B",
+    "type": "single",
+    "question": "ブランチオフィスで新しいルーターを設定します。ルーターは、ブランチが本社と通信できるようにする上流の WAN ネットワークに接続されています。172.24.54.8 の中央タイムサーバーは、本社のファイアウォールの背後にあります。新しいルーターのソフトウェアクロックがタイムサーバーと同期するために、エンジニアはどのコマンドを設定しますか。",
+    "choices": [
+      "ntp client 172.24.54.8",
+      "ntp peer 172.24.54.8",
+      "ntp server 172.24.54.8",
+      "ntp master 172.24.54.8"
+    ],
+    "answerHash": "97b39858a2e3ca932503155ecc9c92c7f0080210f8cd2abac10c138c3483efa5",
+    "explanation": "",
+    "source": "出典: Part15 問4"
+  },
+  {
+    "id": "P15-005",
+    "domain": "NF",
+    "rank": "A",
+    "type": "single",
+    "question": "インターネットへの接続が不安定です。インターフェイスの問題の原因は何ですか。\n\n```\nRouter-WAN1#show interface g0/0\nGigabitEthernet0/0 is up, line protocol is up\n  Hardware is CSR NIC, address is 5000.0001.0000 (bia 5000.0001.0000)\n  Internet address is 192.168.0.0/31\n  MTU 1500 bytes, BW 1000000 Kbit/sec, DLY 10 usec,\n     reliability 255/255, txload 1/255, rxload 1/255\n  Encapsulation ARPA, loopback not set\n  Keepalive set (10 sec)\n  Full Duplex, 1000Mbps, link type is auto, media type is NIC\n  ...\n  Received 110 broadcasts (0 IP multicasts)\n  0 runts, 0 giants, 0 throttles\n  100 input errors, 100 CRC, 100 frame, 0 overrun, 0 ignored\n  ...\n  260 packets output, 89070 bytes, 0 underruns\n  0 output errors, 100 collisions, 0 interface resets\n```",
+    "choices": [
+      "半二重ネゴシエーションによりフレームが破棄される",
+      "ARPタイムアウトが有効になっているためブロードキャストパケットが拒否される",
+      "ブロードキャストストームにより受信バッファがいっぱいになる",
+      "64バイト未満の小さなフレームはサイズが小さいため拒否される"
+    ],
+    "answerHash": "8d8427bf71fbb06503ad4797840e932911a8c8ee1e2126911889323bd8d1a19f",
+    "explanation": "",
+    "source": "出典: Part15 問5"
+  },
+  {
+    "id": "P15-012",
+    "domain": "Sec",
+    "rank": "B",
+    "type": "multi",
+    "question": "2.4GHzおよび5GHzで稼働するワイヤレスネットワークで、WPA2を使用したセキュアな事前共有キーベースのSSIDを作成しています。このプロセスを完了するために、エンジニアが実行しなければならない作業はなにか。(2つ選択)",
+    "choices": [
+      "認証キー管理に802.1xオプションを選択する",
+      "認証キー管理にAESオプションを選択する",
+      "認証キー管理にPSKオプションを選択する",
+      "WPA2 WPA3暗号化に AES (CCMP128)オプションを選択する",
+      "WPAポリシーオプションを選択する"
+    ],
+    "answerHash": "27f33377e9acfdf6dc142d88b2d3b48f190ac743a28c404eeef099a47a006d9e",
+    "explanation": "",
+    "source": "出典: Part15 問12"
+  },
+  {
+    "id": "P15-021",
+    "domain": "NA",
+    "rank": "B",
+    "type": "single",
+    "question": "スプリットMACアーキテクチャでは、リアルタイム制御機能はどこで処理されるか。",
+    "choices": [
+      "個々のAP",
+      "中央WLC",
+      "集中型クラウド管理プラットフォーム",
+      "クライアントデバイス"
+    ],
+    "answerHash": "836df9089f887c51a12b7168a3c0c5e0a68e7876c86737b7d135cd0a9538b8d6",
+    "explanation": "",
+    "source": "出典: Part15 問21"
+  },
+  {
+    "id": "P15-033",
+    "domain": "NA",
+    "rank": "B",
+    "type": "single",
+    "question": "WLC のインバンド無線ネットワーク管理用のデフォルトインターフェースは何ですか。",
+    "choices": [
+      "マネジメント",
+      "冗長ポート",
+      "アウトオブバンド",
+      "サービスポート"
+    ],
+    "answerHash": "4cb6046c6250aaf24059c02027205b09dd281d54f48554005e8ff038b222971f",
+    "explanation": "",
+    "source": "出典: Part15 問33"
+  },
+  {
+    "id": "P15-037",
+    "domain": "Sec",
+    "rank": "C",
+    "type": "single",
+    "question": "純粋なIPsecで送信されるトラフィックのタイプはどれか。",
+    "choices": [
+      "あるサイトのサーバーから別のサイトのホストへのマルチキャストトラフィック",
+      "2つの異なるサイトにあるスイッチ間のスパニングツリー更新",
+      "複数のリモートサイトの1つにあるMACアドレスを見つけようとするスイッチからのブロードキャストパケット",
+      "リモートサイトのホストから本社のサーバーへのユニキャストメッセージ"
+    ],
+    "answerHash": "c25928aa2f5b57fcd149ba960da3f1748b97b1278b2e95454ee597de15e4f155",
+    "explanation": "",
+    "source": "出典: Part15 問37"
+  },
+  {
+    "id": "P15-041",
+    "domain": "Auto",
+    "rank": "C",
+    "type": "single",
+    "question": "RESTリクエストのURI文字列の目的は何ですか。",
+    "choices": [
+      "リモートリソースの変更方法を指定するため",
+      "リクエストのデータコンテンツエンコーディングで応答するため",
+      "データまたはペイロードをリモートリソースに転送する",
+      "ターゲットサーバー上のリソースを識別するため"
+    ],
+    "answerHash": "31d5fb5feea2e2347442a56fc151d620f2ff8188d6640110f730905c98db267e",
+    "explanation": "",
+    "source": "出典: Part15 問41"
+  },
+  {
+    "id": "P15-046",
+    "domain": "Sec",
+    "rank": "C",
+    "type": "single",
+    "question": "Wi-Fi SSID「Office_WLan」にはレイヤー2セキュリティが設定されています。この構成によって何が決定されますか。",
+    "choices": [
+      "x.509標準を使用して、NACとネットワーク・デバイス間で強力な相互認証が使用されています。",
+      "さまざまなレイヤー 2 およびレイヤー 3 攻撃から保護するために設定された堅牢なセキュリティ メカニズムがあります。",
+      "強力な暗号化と認証を提供するガロアキャッシュアルゴリズムが設定されています。",
+      "既知のMACアドレスを持つ許可されたデバイスのみが、ネットワークに接続することを保証するセキュリティの追加レイヤーがある。"
+    ],
+    "answerHash": "df56c75f377157a18a8c87dbbc251d13615d5bb84fb6d15309009ab0d651f6eb",
+    "explanation": "",
+    "source": "出典: Part15 問46"
+  },
+  {
+    "id": "P15-048",
+    "domain": "IPConn",
+    "rank": "A",
+    "type": "single",
+    "question": "ユーザーは192.168.3.0/24上のデバイスには接続できますが、10.10.1.0/24上のユーザーには接続できません。接続性を確認する最初のステップは何ですか。\n\n```\nC:\\Users\\ADMIN>ipconfig\n  Link-local IPv6 Address . . . . . : fe80::8a79:bcde:34dc:c11e35%\n  IPv4 Address . . . . . . . . . . : 192.168.3.20(Preferred)\n  Subnet Mask . . . . . . . . . . . : 255.255.255.0\n  Default Gateway . . . . . . . . . : 192.168.3.1\n  DHCP Server . . . . . . . . . . . : 192.168.3.1\n  DNS Servers . . . . . . . . . . . : 10.10.1.254\n```",
+    "choices": [
+      "DNSサーバーに到達可能か",
+      "インターネットに接続できるか",
+      "デフォルトゲートウェイに到達可能か"
+    ],
+    "answerHash": "73d5252878c9805bdcc2b1ec30d5badad6cbcf0740a35e177f6da7c992ac6cd7",
+    "explanation": "",
+    "source": "出典: Part15 問48"
+  },
+  {
+    "id": "P15-050",
+    "domain": "NF",
+    "rank": "B",
+    "type": "single",
+    "question": "ネットワークエンジニアが、認証サーバーの設定とダイナミックインターフェイスの作成によって、新しい無線LANの実装を開始します。基本設定を完了するには、次に何を実行しますか。",
+    "choices": [
+      "管理インターフェイスでTelnetとRADIUSアクセスを有効にする。",
+      "新しい WLAN を作成し、ダイナミックインターフェイスをそれにバインドします。",
+      "管理インターフェイスをインストールし、管理IPを追加します。",
+      "アクセスポイントの高可用性と冗長性を設定します。"
+    ],
+    "answerHash": "e5bfb0e1892e4c9a376af10b88b2395d80d8eaa8b6150546086eddb0a0896cc1",
+    "explanation": "",
+    "source": "出典: Part15 問50"
+  },
+  {
+    "id": "P15-056",
+    "domain": "Sec",
+    "rank": "B",
+    "type": "single",
+    "question": "機械学習によって不正なネットワークアクセスの検出がどのように改善されますか。",
+    "choices": [
+      "セキュリティ ポリシーの更新を指示します。",
+      "セキュリティ クリアランス レベルを割り当てます。",
+      "侵入を示すパターンを識別します。",
+      "古いソフトウェアを監視します。"
+    ],
+    "answerHash": "6cef965d20312f4269c7e759797ac5048b4f70a7096b668bc235036fbad96473",
+    "explanation": "",
+    "source": "出典: Part15 問56"
+  },
+  {
+    "id": "P16-034",
+    "domain": "NA",
+    "rank": "S",
+    "type": "single",
+    "question": "ネットワーク内のアプリケーションが300台のサーバーから600台にスケールアップされています。各サーバーは本番・バックアップ・管理環境のトラフィックをサポートするために3つのネットワーク接続を必要とします。各接続は異なるサブネット上に存在します。本番環境ネットワークのルータ設定は、まず 10.0.0.0/8 内のサブネットを使用して設定する必要があります。要件を満たし、無駄なIPアドレス空間を制限するために、ルータのインターフェースに設定する必要があるコマンドはどれですか？",
+    "choices": [
+      "ip address 10.10.10.1 255.255.254.0",
+      "ip address 10.10.10.1 255.255.252.0",
+      "ip address 10.10.10.1 255.255.255.240",
+      "ip address 10.10.10.1 255.255.240.0"
+    ],
+    "answerHash": "b8de006ff684cf204486cf5d07e7e846a023eff5e1028038393cfce4ae403e64",
+    "explanation": "",
+    "source": "出典: Part16 問34"
+  },
+  {
+    "id": "P16-040",
+    "domain": "IPConn",
+    "rank": "S",
+    "type": "single",
+    "question": "192.168.18.16 に到達するにはどのインターフェースを経由しますか?\n\n```\n192.168.18.0/24 is variably subnetted, 3 subnets, 3 masks\nD    192.168.18.0/24 [90/3072] via 10.10.10.10, GigabitEthernet0/0\nR    192.168.18.0/27 [120/1] via 10.10.20.10, GigabitEthernet1/0\nO    192.168.18.0/28 [110/2] via 10.10.30.10, GigabitEthernet2/0\n```",
+    "choices": [
+      "GigabitEthernet2/0",
+      "GigabitEthernet1/0",
+      "Null0",
+      "GigabitEthernet0/0"
+    ],
+    "answerHash": "1126a043ec4a11a90816daddab193363039f92801d28a90ab46a1c7ae4c217da",
+    "explanation": "",
+    "source": "出典: Part16 問40"
+  },
+  {
+    "id": "P16-042",
+    "domain": "IPConn",
+    "rank": "A",
+    "type": "single",
+    "question": "R1が192.168.2.86と10.20.1.50に到達するための正しいネクストホップはどれですか？\n\n```\nR1#show ip route static\nS   10.20.1.0/26 [1/0] via 172.16.1.4\nS   10.20.1.32/27 [1/0] via 172.16.1.2\nS   10.20.1.0/24 [1/0] via 172.16.1.3\nS   192.168.2.0/24 [1/0] via 172.16.1.4\nS   192.168.2.80/29 [1/0] via 172.16.1.2\nS   192.168.2.64/27 [1/0] via 172.16.1.3\n```",
+    "choices": [
+      "172.16.1.2",
+      "172.16.1.3",
+      "172.16.1.4",
+      "172.16.1.1"
+    ],
+    "answerHash": "6f63fa10bf23c6d815fe091fef5dcc28805f57c5c7a047ba868f6846fb97616a",
+    "explanation": "",
+    "source": "出典: Part16 問42"
+  }
+]</script>
+<script type="application/json" id="sim-data">{"sims": [{"simId": "BANK-S13", "title": "VLAN and LLDP Sim", "domain": "NA", "archetype": "VLAN-LLDP", "origin": "S-13", "grammarTier": "T1", "points": 10, "topology": {"ref": "原典S-13論理等価（R1サブIF＝環境・SW-1/SW-2。VLAN35/39・LLDP制御）", "logical": "ルータR1(サブIF Fa0/0.35=VLAN35 GW／Fa0/1.39=VLAN39 GW・lldp run＝環境)＋スイッチSW-1/SW-2。R1(Fa0/0)-SW-1(Fa0/1)トランク／R1(Fa0/1)-SW-2(Fa0/1)トランク／SW-1(Fa0/2)-SW-2(Fa0/2)。PC1=SW-1 Fa0/3(VLAN35)／PC2=SW-2 Fa0/3(VLAN39)。LLDPは既定OFF＝両スイッチでlldp run、PC1ポート(SW-1 Fa0/3)は送受信無効。", "image": null}, "requirements": ["タスク1: SW-1 にVLAN35を作成し名前SALESを付ける。", "タスク2: SW-2 にVLAN39を作成し名前MARKETINGを付ける。", "タスク3: SW-1 Fa0/3(PC1)をVLAN35・SW-2 Fa0/3(PC2)をVLAN39のアクセスポートにする。", "タスク4: 業界標準の近隣探索(LLDP)を両スイッチで有効化(lldp run)し、PC1接続のSW-1 Fa0/3はLLDP送受信とも無効化する。", "設定後、各スイッチで running-config を startup-config に保存する。"], "baseline": {"simId": "BANK-S13", "devices": [{"name": "R1", "type": "router", "role": "environment", "interfaces": ["FastEthernet0/0", "FastEthernet0/0.35", "FastEthernet0/1", "FastEthernet0/1.39"], "baselineRunning": "hostname R1\nlldp run\n!\ninterface FastEthernet0/0\n!\ninterface FastEthernet0/0.35\n encapsulation dot1q 35\n ip address 10.35.1.1 255.255.255.0\n!\ninterface FastEthernet0/1\n!\ninterface FastEthernet0/1.39\n encapsulation dot1q 39\n ip address 10.39.1.1 255.255.255.0\n!\nend", "baselineStartup": "hostname R1\nlldp run\n!\ninterface FastEthernet0/0\n!\ninterface FastEthernet0/0.35\n encapsulation dot1q 35\n ip address 10.35.1.1 255.255.255.0\n!\ninterface FastEthernet0/1\n!\ninterface FastEthernet0/1.39\n encapsulation dot1q 39\n ip address 10.39.1.1 255.255.255.0\n!\nend"}, {"name": "SW-1", "type": "switch", "role": "exam", "interfaces": ["FastEthernet0/1"], "baselineRunning": "hostname SW-1\n!\ninterface FastEthernet0/1\n switchport mode trunk\n!\nend", "baselineStartup": "hostname SW-1\n!\ninterface FastEthernet0/1\n switchport mode trunk\n!\nend"}, {"name": "SW-2", "type": "switch", "role": "exam", "interfaces": ["FastEthernet0/1"], "baselineRunning": "hostname SW-2\n!\ninterface FastEthernet0/1\n switchport mode trunk\n!\nend", "baselineStartup": "hostname SW-2\n!\ninterface FastEthernet0/1\n switchport mode trunk\n!\nend"}]}, "finishedKey": {"simId": "BANK-S13", "devices": [{"name": "SW-1", "finishedRunning": "hostname SW-1\nlldp run\n!\nvlan 35\n name SALES\n!\ninterface FastEthernet0/1\n switchport mode trunk\n!\ninterface FastEthernet0/3\n switchport mode access\n switchport access vlan 35\n no lldp transmit\n no lldp receive\n!\nend"}, {"name": "SW-2", "finishedRunning": "hostname SW-2\nlldp run\n!\nvlan 39\n name MARKETING\n!\ninterface FastEthernet0/1\n switchport mode trunk\n!\ninterface FastEthernet0/3\n switchport mode access\n switchport access vlan 39\n!\nend"}]}, "rubric": {"simId": "BANK-S13", "points": 10, "elements": [{"id": "bs13-sw1-vlan", "desc": "SW-1: VLAN35(SALES) 作成・命名", "weight": 1, "device": "SW-1", "section": "vlan", "expect": ["name SALES"], "expectAbsent": [], "accept": []}, {"id": "bs13-sw1-lldprun", "desc": "SW-1: LLDP有効化(lldp run)", "weight": 1, "device": "SW-1", "section": "global", "expect": ["lldp run"], "expectAbsent": [], "accept": []}, {"id": "bs13-sw1-fa3-acc", "desc": "SW-1 Fa0/3(PC1) をVLAN35アクセス", "weight": 2, "device": "SW-1", "section": "interface", "expect": ["switchport mode access", "switchport access vlan 35"], "expectAbsent": [], "accept": [], "interface": "FastEthernet0/3"}, {"id": "bs13-sw1-fa3-lldpoff", "desc": "SW-1 Fa0/3(PC1向け) をLLDP送受信とも無効", "weight": 2, "device": "SW-1", "section": "interface", "expect": ["no lldp transmit", "no lldp receive"], "expectAbsent": [], "accept": [], "interface": "FastEthernet0/3"}, {"id": "bs13-sw2-vlan", "desc": "SW-2: VLAN39(MARKETING) 作成・命名", "weight": 1, "device": "SW-2", "section": "vlan", "expect": ["name MARKETING"], "expectAbsent": [], "accept": []}, {"id": "bs13-sw2-lldprun", "desc": "SW-2: LLDP有効化(lldp run)", "weight": 1, "device": "SW-2", "section": "global", "expect": ["lldp run"], "expectAbsent": [], "accept": []}, {"id": "bs13-sw2-fa3-acc", "desc": "SW-2 Fa0/3(PC2) をVLAN39アクセス", "weight": 2, "device": "SW-2", "section": "interface", "expect": ["switchport mode access", "switchport access vlan 39"], "expectAbsent": [], "accept": [], "interface": "FastEthernet0/3"}]}, "derivation": {"added": {"R1": {}, "SW-1": {"global": ["lldp run"], "vlan 35": ["name SALES"], "interface FastEthernet0/3": ["switchport mode access", "switchport access vlan 35", "no lldp transmit", "no lldp receive"]}, "SW-2": {"global": ["lldp run"], "vlan 39": ["name MARKETING"], "interface FastEthernet0/3": ["switchport mode access", "switchport access vlan 39"]}}, "removedState": {"R1": {}, "SW-1": {}, "SW-2": {}}, "weightSum": 10, "unscored": []}}, {"simId": "BANK-S14", "title": "IPv6 Static Routing Sim", "domain": "IPConn", "archetype": "Static-v6", "origin": "S-14", "grammarTier": "T3-Static", "points": 10, "topology": {"ref": "原典S-14論理等価（R1〜R4＋Server1・IPv6のみ。主経路＋フローティングAD2）", "logical": "ルータ4台＋サーバ(IPv6)。R1 Gi0/0-R2 Gi0/0(2001:db8:12::/64)／R1 Gi0/1-R3 Gi0/0(2001:db8:13::/64)／R2 Gi0/1-R4 Gi0/0(2001:db8:24::/64)／R3 Gi0/1-R4 Gi0/1(2001:db8:34::/64)／R4 Gi0/2-Server1(2001:db8:41::/64)。R2/R3/R4は下地ルート保持の環境機器。タスクはR1のみ＝2001:db8:41::/64への主経路(R2優先)＋フローティング(AD2・R3経由)。", "image": null}, "requirements": ["タスク1: R1に2001:db8:41::/64への静的ルート(R2優先・NH=2001:db8:12::6)を設定する。", "タスク2: R2ダウンに備え、R1にR3経由のフローティングスタティック(同宛先・AD2・NH=2001:db8:13::8)を設定する。", "タスク3: R1からServer(2001:db8:41::10)への到達を確認する(設定なし)。", "設定後、R1で running-config を startup-config に保存する。"], "baseline": {"simId": "BANK-S14", "devices": [{"name": "R1", "type": "router", "role": "exam", "interfaces": ["GigabitEthernet0/0", "GigabitEthernet0/1"], "baselineRunning": "hostname R1\n!\ninterface GigabitEthernet0/0\n ipv6 address 2001:db8:12::5/64\n!\ninterface GigabitEthernet0/1\n ipv6 address 2001:db8:13::7/64\n!\nend", "baselineStartup": "hostname R1\n!\ninterface GigabitEthernet0/0\n ipv6 address 2001:db8:12::5/64\n!\ninterface GigabitEthernet0/1\n ipv6 address 2001:db8:13::7/64\n!\nend"}, {"name": "R2", "type": "router", "role": "environment", "interfaces": ["GigabitEthernet0/0", "GigabitEthernet0/1"], "baselineRunning": "hostname R2\nipv6 route 2001:db8:41::/64 2001:db8:24::4\nipv6 route 2001:db8:13::/64 2001:db8:12::5\n!\ninterface GigabitEthernet0/0\n ipv6 address 2001:db8:12::6/64\n!\ninterface GigabitEthernet0/1\n ipv6 address 2001:db8:24::2/64\n!\nend", "baselineStartup": "hostname R2\nipv6 route 2001:db8:41::/64 2001:db8:24::4\nipv6 route 2001:db8:13::/64 2001:db8:12::5\n!\ninterface GigabitEthernet0/0\n ipv6 address 2001:db8:12::6/64\n!\ninterface GigabitEthernet0/1\n ipv6 address 2001:db8:24::2/64\n!\nend"}, {"name": "R3", "type": "router", "role": "environment", "interfaces": ["GigabitEthernet0/0", "GigabitEthernet0/1"], "baselineRunning": "hostname R3\nipv6 route 2001:db8:41::/64 2001:db8:34::9\n!\ninterface GigabitEthernet0/0\n ipv6 address 2001:db8:13::8/64\n!\ninterface GigabitEthernet0/1\n ipv6 address 2001:db8:34::3/64\n!\nend", "baselineStartup": "hostname R3\nipv6 route 2001:db8:41::/64 2001:db8:34::9\n!\ninterface GigabitEthernet0/0\n ipv6 address 2001:db8:13::8/64\n!\ninterface GigabitEthernet0/1\n ipv6 address 2001:db8:34::3/64\n!\nend"}, {"name": "R4", "type": "router", "role": "environment", "interfaces": ["GigabitEthernet0/0", "GigabitEthernet0/1", "GigabitEthernet0/2"], "baselineRunning": "hostname R4\nipv6 route 2001:db8:12::/64 2001:db8:24::2\nipv6 route 2001:db8:13::/64 2001:db8:34::3\n!\ninterface GigabitEthernet0/0\n ipv6 address 2001:db8:24::4/64\n!\ninterface GigabitEthernet0/1\n ipv6 address 2001:db8:34::9/64\n!\ninterface GigabitEthernet0/2\n ipv6 address 2001:db8:41::1/64\n!\nend", "baselineStartup": "hostname R4\nipv6 route 2001:db8:12::/64 2001:db8:24::2\nipv6 route 2001:db8:13::/64 2001:db8:34::3\n!\ninterface GigabitEthernet0/0\n ipv6 address 2001:db8:24::4/64\n!\ninterface GigabitEthernet0/1\n ipv6 address 2001:db8:34::9/64\n!\ninterface GigabitEthernet0/2\n ipv6 address 2001:db8:41::1/64\n!\nend"}]}, "finishedKey": {"simId": "BANK-S14", "devices": [{"name": "R1", "finishedRunning": "hostname R1\nipv6 route 2001:db8:41::/64 2001:db8:12::6\nipv6 route 2001:db8:41::/64 2001:db8:13::8 2\n!\ninterface GigabitEthernet0/0\n ipv6 address 2001:db8:12::5/64\n!\ninterface GigabitEthernet0/1\n ipv6 address 2001:db8:13::7/64\n!\nend"}]}, "rubric": {"simId": "BANK-S14", "points": 10, "elements": [{"id": "bs14-r1-main", "desc": "R1: 2001:db8:41::/64への主経路(R2優先 NH=2001:db8:12::6)", "weight": 5, "device": "R1", "section": "global", "expect": ["ipv6 route 2001:db8:41::/64 2001:db8:12::6"], "expectAbsent": [], "accept": []}, {"id": "bs14-r1-float", "desc": "R1: 同宛先のフローティング(AD2・R3経由 NH=2001:db8:13::8)", "weight": 5, "device": "R1", "section": "global", "expect": ["ipv6 route 2001:db8:41::/64 2001:db8:13::8 2"], "expectAbsent": [], "accept": []}]}, "derivation": {"added": {"R1": {"global": ["ipv6 route 2001:db8:41::/64 2001:db8:12::6", "ipv6 route 2001:db8:41::/64 2001:db8:13::8 2"]}, "R2": {}, "R3": {}, "R4": {}}, "removedState": {"R1": {}, "R2": {}, "R3": {}, "R4": {}}, "weightSum": 10, "unscored": []}}, {"simId": "BANK-S16", "title": "Named ACL & DHCP Snooping 2 Sim", "domain": "Sec", "archetype": "NACL-Snoop", "origin": "S-16", "grammarTier": "T3-ACL", "points": 10, "topology": {"ref": "原典S-16論理等価（R1=DHCP/OSPF・既存INTERNET_ACL前半3行は下地。改修=末尾追記。Sw101〜104=L3）", "logical": "ルータR1(DHCPサーバ・OSPF・既存INTERNET_ACL前半ospf/bootps/domain＝下地)とL3スイッチSw101〜104(ip routing・OSPF・ルーテッドポート)。PC1=Sw101 VLAN101(SVI helper経由でDHCP取得)。T2は既存INTERNET_ACLへ443/telnet/deny logを末尾追記し、R1 Gi0/0・Gi0/3 両アップリンクの in に適用(permit ospfを消さない)。Sw101スヌーピングはリレー経由のため trust不要。", "image": null}, "requirements": ["タスク1: Sw103 に username devnet(privilege 15・algorithm-type sha256 secret access8cli)を作成し、vty 0-4 を transport input telnet＋login local にする。", "タスク2: 既存の名前付き拡張ACL INTERNET_ACL(下地: permit ospf/bootps/domain)に末尾追記する。順に ①172.16.0.0/16のHTTPS(443)許可 ②VLAN101(172.16.101.0/24)のtelnet許可 ③deny ip any any log-input。R1 Gi0/0・Gi0/3 の in に適用する(前半3行は消さない)。", "タスク3: Sw101 で DHCPスヌーピングを有効化(global＋vlan 101＋option82挿入無効＋verify mac-address)する(本問はリレー経由のため trust 不要)。", "設定後、R1・Sw101・Sw103 で running-config を startup-config に保存する。"], "baseline": {"simId": "BANK-S16", "devices": [{"name": "R1", "type": "router", "role": "exam", "interfaces": ["GigabitEthernet0/0", "GigabitEthernet0/1", "GigabitEthernet0/3"], "baselineRunning": "hostname R1\nip domain-name 9tut.com\nip route 0.0.0.0 0.0.0.0 209.165.201.2\nip dhcp pool NETPOOL\nnetwork 172.16.101.0 255.255.255.0\ndefault-router 172.16.101.1\nip dhcp excluded-address 172.16.101.1 172.16.101.3\n!\ninterface GigabitEthernet0/0\n ip address 172.16.1.17 255.255.255.252\n!\ninterface GigabitEthernet0/1\n ip address 209.165.201.1 255.255.255.252\n!\ninterface GigabitEthernet0/3\n ip address 172.16.1.21 255.255.255.252\n!\nrouter ospf 1\n network 172.16.0.0 0.0.255.255 area 0\n network 209.165.201.0 0.0.0.3 area 0\n default-information originate\n!\nip access-list extended INTERNET_ACL\n permit ospf any any\n permit udp any any eq bootps\n permit udp any any eq domain\n!\nend", "baselineStartup": "hostname R1\nip domain-name 9tut.com\nip route 0.0.0.0 0.0.0.0 209.165.201.2\nip dhcp pool NETPOOL\nnetwork 172.16.101.0 255.255.255.0\ndefault-router 172.16.101.1\nip dhcp excluded-address 172.16.101.1 172.16.101.3\n!\ninterface GigabitEthernet0/0\n ip address 172.16.1.17 255.255.255.252\n!\ninterface GigabitEthernet0/1\n ip address 209.165.201.1 255.255.255.252\n!\ninterface GigabitEthernet0/3\n ip address 172.16.1.21 255.255.255.252\n!\nrouter ospf 1\n network 172.16.0.0 0.0.255.255 area 0\n network 209.165.201.0 0.0.0.3 area 0\n default-information originate\n!\nip access-list extended INTERNET_ACL\n permit ospf any any\n permit udp any any eq bootps\n permit udp any any eq domain\n!\nend"}, {"name": "Sw101", "type": "switch", "role": "exam", "interfaces": ["FastEthernet0/1", "FastEthernet0/2", "FastEthernet0/3", "Vlan101"], "baselineRunning": "hostname Sw101\nip routing\n!\nvlan 101\n!\ninterface FastEthernet0/1\n switchport mode access\n switchport access vlan 101\n!\ninterface FastEthernet0/2\n no switchport\n ip address 172.16.1.1 255.255.255.252\n!\ninterface FastEthernet0/3\n no switchport\n ip address 172.16.1.5 255.255.255.252\n!\ninterface Vlan101\n ip address 172.16.101.1 255.255.255.0\n ip helper-address 172.16.1.17\n!\nrouter ospf 1\n network 172.16.0.0 0.0.255.255 area 0\n!\nend", "baselineStartup": "hostname Sw101\nip routing\n!\nvlan 101\n!\ninterface FastEthernet0/1\n switchport mode access\n switchport access vlan 101\n!\ninterface FastEthernet0/2\n no switchport\n ip address 172.16.1.1 255.255.255.252\n!\ninterface FastEthernet0/3\n no switchport\n ip address 172.16.1.5 255.255.255.252\n!\ninterface Vlan101\n ip address 172.16.101.1 255.255.255.0\n ip helper-address 172.16.1.17\n!\nrouter ospf 1\n network 172.16.0.0 0.0.255.255 area 0\n!\nend"}, {"name": "Sw103", "type": "switch", "role": "exam", "interfaces": ["FastEthernet0/1", "FastEthernet0/2", "FastEthernet0/3"], "baselineRunning": "hostname Sw103\nip routing\n!\ninterface FastEthernet0/1\n no switchport\n ip address 172.16.1.13 255.255.255.252\n!\ninterface FastEthernet0/2\n no switchport\n ip address 172.16.1.18 255.255.255.252\n!\ninterface FastEthernet0/3\n no switchport\n ip address 172.16.1.6 255.255.255.252\n!\nrouter ospf 1\n network 172.16.0.0 0.0.255.255 area 0\n!\nend", "baselineStartup": "hostname Sw103\nip routing\n!\ninterface FastEthernet0/1\n no switchport\n ip address 172.16.1.13 255.255.255.252\n!\ninterface FastEthernet0/2\n no switchport\n ip address 172.16.1.18 255.255.255.252\n!\ninterface FastEthernet0/3\n no switchport\n ip address 172.16.1.6 255.255.255.252\n!\nrouter ospf 1\n network 172.16.0.0 0.0.255.255 area 0\n!\nend"}]}, "finishedKey": {"simId": "BANK-S16", "devices": [{"name": "R1", "finishedRunning": "hostname R1\nip domain-name 9tut.com\nip route 0.0.0.0 0.0.0.0 209.165.201.2\nip dhcp pool NETPOOL\nnetwork 172.16.101.0 255.255.255.0\ndefault-router 172.16.101.1\nip dhcp excluded-address 172.16.101.1 172.16.101.3\n!\ninterface GigabitEthernet0/0\n ip address 172.16.1.17 255.255.255.252\n ip access-group INTERNET_ACL in\n!\ninterface GigabitEthernet0/1\n ip address 209.165.201.1 255.255.255.252\n!\ninterface GigabitEthernet0/3\n ip address 172.16.1.21 255.255.255.252\n ip access-group INTERNET_ACL in\n!\nrouter ospf 1\n network 172.16.0.0 0.0.255.255 area 0\n network 209.165.201.0 0.0.0.3 area 0\n default-information originate\n!\nip access-list extended INTERNET_ACL\n permit ospf any any\n permit udp any any eq bootps\n permit udp any any eq domain\n permit tcp 172.16.0.0 0.0.255.255 any eq 443\n permit tcp 172.16.101.0 0.0.0.255 any eq telnet\n deny ip any any log-input\n!\nend"}, {"name": "Sw101", "finishedRunning": "hostname Sw101\nip routing\nip dhcp snooping\nip dhcp snooping vlan 101\nno ip dhcp snooping information option\nip dhcp snooping verify mac-address\n!\nvlan 101\n!\ninterface FastEthernet0/1\n switchport mode access\n switchport access vlan 101\n!\ninterface FastEthernet0/2\n no switchport\n ip address 172.16.1.1 255.255.255.252\n!\ninterface FastEthernet0/3\n no switchport\n ip address 172.16.1.5 255.255.255.252\n!\ninterface Vlan101\n ip address 172.16.101.1 255.255.255.0\n ip helper-address 172.16.1.17\n!\nrouter ospf 1\n network 172.16.0.0 0.0.255.255 area 0\n!\nend"}, {"name": "Sw103", "finishedRunning": "hostname Sw103\nip routing\nusername devnet privilege 15 algorithm-type sha256 secret access8cli\n!\ninterface FastEthernet0/1\n no switchport\n ip address 172.16.1.13 255.255.255.252\n!\ninterface FastEthernet0/2\n no switchport\n ip address 172.16.1.18 255.255.255.252\n!\ninterface FastEthernet0/3\n no switchport\n ip address 172.16.1.6 255.255.255.252\n!\nrouter ospf 1\n network 172.16.0.0 0.0.255.255 area 0\n!\nline vty 0 4\n transport input telnet\n login local\n!\nend"}]}, "rubric": {"simId": "BANK-S16", "points": 10, "elements": [{"id": "s16-sw103-user", "desc": "T1 ローカルアカウント devnet(sha256 secret・priv15)", "weight": 1, "device": "Sw103", "section": "global", "expect": ["username devnet privilege 15 algorithm-type sha256 secret access8cli"], "expectAbsent": [], "accept": []}, {"id": "s16-sw103-vty", "desc": "T1 vty 0-4 を transport telnet＋login local", "weight": 1, "device": "Sw103", "section": "line-vty", "expect": ["transport input telnet", "login local"], "expectAbsent": [], "accept": []}, {"id": "s16-r1-acl4", "desc": "T2 INTERNET_ACL 追記#40 permit HTTPS(172.16.0.0/16)＝下地3行の後", "weight": 1, "device": "R1", "section": "acl", "expect": ["permit tcp 172.16.0.0 0.0.255.255 any eq 443"], "expectAbsent": [], "accept": [], "aclName": "INTERNET_ACL"}, {"id": "s16-r1-acl5", "desc": "T2 INTERNET_ACL 追記#50 permit telnet(VLAN101)", "weight": 1, "device": "R1", "section": "acl", "expect": ["permit tcp 172.16.101.0 0.0.0.255 any eq telnet"], "expectAbsent": [], "accept": [], "aclName": "INTERNET_ACL"}, {"id": "s16-r1-acl6", "desc": "T2 INTERNET_ACL 追記#60 deny ip any any log-input", "weight": 1, "device": "R1", "section": "acl", "expect": ["deny ip any any log-input"], "expectAbsent": [], "accept": [], "aclName": "INTERNET_ACL"}, {"id": "s16-r1-apply0", "desc": "T2 INTERNET_ACL を Gi0/0 in 適用", "weight": 1, "device": "R1", "section": "interface", "expect": ["ip access-group INTERNET_ACL in"], "expectAbsent": [], "accept": [], "interface": "GigabitEthernet0/0"}, {"id": "s16-r1-apply3", "desc": "T2 INTERNET_ACL を Gi0/3 in 適用(両アップリンク)", "weight": 1, "device": "R1", "section": "interface", "expect": ["ip access-group INTERNET_ACL in"], "expectAbsent": [], "accept": [], "interface": "GigabitEthernet0/3"}, {"id": "s16-sw101-snoop-core", "desc": "T3 DHCPスヌーピング(global＋vlan101)", "weight": 2, "device": "Sw101", "section": "global", "expect": ["ip dhcp snooping", "ip dhcp snooping vlan 101"], "expectAbsent": [], "accept": []}, {"id": "s16-sw101-snoop-opt", "desc": "T3 option82無効＋MAC検証(trust不要=リレー経由)", "weight": 1, "device": "Sw101", "section": "global", "expect": ["no ip dhcp snooping information option", "ip dhcp snooping verify mac-address"], "expectAbsent": [], "accept": []}]}, "derivation": {"added": {"R1": {"interface GigabitEthernet0/0": ["ip access-group INTERNET_ACL in"], "interface GigabitEthernet0/3": ["ip access-group INTERNET_ACL in"], "ip access-list extended INTERNET_ACL": ["permit tcp 172.16.0.0 0.0.255.255 any eq 443", "permit tcp 172.16.101.0 0.0.0.255 any eq telnet", "deny ip any any log-input"]}, "Sw101": {"global": ["ip dhcp snooping", "ip dhcp snooping vlan 101", "no ip dhcp snooping information option", "ip dhcp snooping verify mac-address"]}, "Sw103": {"global": ["username devnet privilege 15 algorithm-type sha256 secret access8cli"], "line vty 0 4": ["transport input telnet", "login local"]}}, "removedState": {"R1": {}, "Sw101": {}, "Sw103": {}}, "weightSum": 10, "unscored": []}}, {"simId": "BANK-S38", "title": "NAT DHCP SSH Sim", "domain": "IPSvc", "archetype": "NAT-Relay-SSH", "origin": "S-38", "grammarTier": "T3-IPSvc", "points": 10, "topology": {"ref": "原典S-38論理等価（R1[NAT/NTP/DHCPサーバ]/Sw1[L3]/ISP/PC1/PC2。NAT/PAT＋NTP＋DHCPリレー＋SSH）", "logical": "ルータR1、L3スイッチSw1、ISP(到達先)、PC1(Sales)/PC2(Marketing)。R1 Gi0/0-ISP(10.0.18.8/30)／R1 Gi0/1-Sw1 Fa0/1(172.16.0.8/30)／Sw1 Fa0/2-PC1(192.168.1.0/24)／Sw1 Fa0/3-PC2(192.168.2.0/24)。Sw1 Fa0/1〜0/3は no switchport(各LANのGW=.1)。R1=NAT/PAT(inside=Gi0/1・outside=Gi0/0・ACL192/inside/outsideは下地)兼NTPサーバ(master)兼DHCPサーバ(SALES/MARKETINGプール下地)。Sw1がNTPクライアント・Fa0/2でDHCPリレー(helper→R1)・SSHv2サーバ(domain/username下地)。ISP=環境、PCはDHCPクライアント(TOPOのみ)。", "image": null}, "requirements": ["タスク1(NAT/PAT仕上げ): R1 で ip nat inside source list 192 interface Gi0/0 overload を設定する(inside/outside宣言とACL192は下地)。", "タスク2(NTP): R1 を ntp master(NTPサーバ)、Sw1 を ntp server 172.16.0.9 で同期させる(原文の ntp source Loopback0 はPT機非対応のため省略し、参照先を直結応答面172.16.0.9にするfallback)。", "タスク3(DHCPリレー): Sw1 の Fa0/2(Sales側) に ip helper-address 172.16.0.9 を設定し、DHCP要求をR1へ転送する。", "タスク4(SSH): Sw1 で crypto key generate rsa(2048)＋ip ssh version 2＋line vty 0 15(transport input ssh・login local)を設定する(hostname/domain/usernameは下地)。", "設定後、R1・Sw1 で running-config を startup-config に保存する。"], "baseline": {"simId": "BANK-S38", "devices": [{"name": "R1", "type": "router", "role": "exam", "interfaces": ["GigabitEthernet0/0", "GigabitEthernet0/1", "Loopback0"], "baselineRunning": "hostname R1\naccess-list 192 permit ip 192.168.0.0 0.0.3.255 any\nip route 192.168.1.0 255.255.255.0 172.16.0.10\nip route 192.168.2.0 255.255.255.0 172.16.0.10\nip route 0.0.0.0 0.0.0.0 10.0.18.10\nip dhcp excluded-address 192.168.1.1\nip dhcp excluded-address 192.168.2.1\nip dhcp pool SALES\nnetwork 192.168.1.0 255.255.255.0\ndefault-router 192.168.1.1\nip dhcp pool MARKETING\nnetwork 192.168.2.0 255.255.255.0\ndefault-router 192.168.2.1\n!\ninterface GigabitEthernet0/0\n ip address 10.0.18.9 255.255.255.252\n ip nat outside\n!\ninterface GigabitEthernet0/1\n ip address 172.16.0.9 255.255.255.252\n ip nat inside\n!\ninterface Loopback0\n ip address 209.165.202.134 255.255.255.255\n!\nend", "baselineStartup": "hostname R1\naccess-list 192 permit ip 192.168.0.0 0.0.3.255 any\nip route 192.168.1.0 255.255.255.0 172.16.0.10\nip route 192.168.2.0 255.255.255.0 172.16.0.10\nip route 0.0.0.0 0.0.0.0 10.0.18.10\nip dhcp excluded-address 192.168.1.1\nip dhcp excluded-address 192.168.2.1\nip dhcp pool SALES\nnetwork 192.168.1.0 255.255.255.0\ndefault-router 192.168.1.1\nip dhcp pool MARKETING\nnetwork 192.168.2.0 255.255.255.0\ndefault-router 192.168.2.1\n!\ninterface GigabitEthernet0/0\n ip address 10.0.18.9 255.255.255.252\n ip nat outside\n!\ninterface GigabitEthernet0/1\n ip address 172.16.0.9 255.255.255.252\n ip nat inside\n!\ninterface Loopback0\n ip address 209.165.202.134 255.255.255.255\n!\nend"}, {"name": "Sw1", "type": "switch", "role": "exam", "interfaces": ["FastEthernet0/1", "FastEthernet0/2", "FastEthernet0/3"], "baselineRunning": "hostname Sw1\nip routing\nip route 0.0.0.0 0.0.0.0 172.16.0.9\nip domain-name example.com\nusername admin privilege 15 secret StrongPass!\n!\ninterface FastEthernet0/1\n no switchport\n ip address 172.16.0.10 255.255.255.252\n!\ninterface FastEthernet0/2\n no switchport\n ip address 192.168.1.1 255.255.255.0\n!\ninterface FastEthernet0/3\n no switchport\n ip address 192.168.2.1 255.255.255.0\n!\nend", "baselineStartup": "hostname Sw1\nip routing\nip route 0.0.0.0 0.0.0.0 172.16.0.9\nip domain-name example.com\nusername admin privilege 15 secret StrongPass!\n!\ninterface FastEthernet0/1\n no switchport\n ip address 172.16.0.10 255.255.255.252\n!\ninterface FastEthernet0/2\n no switchport\n ip address 192.168.1.1 255.255.255.0\n!\ninterface FastEthernet0/3\n no switchport\n ip address 192.168.2.1 255.255.255.0\n!\nend"}, {"name": "ISP", "type": "router", "role": "environment", "interfaces": ["GigabitEthernet0/0"], "baselineRunning": "hostname ISP\n!\ninterface GigabitEthernet0/0\n ip address 10.0.18.10 255.255.255.252\n!\nend", "baselineStartup": "hostname ISP\n!\ninterface GigabitEthernet0/0\n ip address 10.0.18.10 255.255.255.252\n!\nend"}]}, "finishedKey": {"simId": "BANK-S38", "devices": [{"name": "R1", "finishedRunning": "hostname R1\naccess-list 192 permit ip 192.168.0.0 0.0.3.255 any\nip route 192.168.1.0 255.255.255.0 172.16.0.10\nip route 192.168.2.0 255.255.255.0 172.16.0.10\nip route 0.0.0.0 0.0.0.0 10.0.18.10\nip dhcp excluded-address 192.168.1.1\nip dhcp excluded-address 192.168.2.1\nip dhcp pool SALES\nnetwork 192.168.1.0 255.255.255.0\ndefault-router 192.168.1.1\nip dhcp pool MARKETING\nnetwork 192.168.2.0 255.255.255.0\ndefault-router 192.168.2.1\nip nat inside source list 192 interface GigabitEthernet0/0 overload\nntp master\n!\ninterface GigabitEthernet0/0\n ip address 10.0.18.9 255.255.255.252\n ip nat outside\n!\ninterface GigabitEthernet0/1\n ip address 172.16.0.9 255.255.255.252\n ip nat inside\n!\ninterface Loopback0\n ip address 209.165.202.134 255.255.255.255\n!\nend"}, {"name": "Sw1", "finishedRunning": "hostname Sw1\nip routing\nip route 0.0.0.0 0.0.0.0 172.16.0.9\nip domain-name example.com\nusername admin privilege 15 secret StrongPass!\nntp server 172.16.0.9\nip ssh version 2\n!\ninterface FastEthernet0/1\n no switchport\n ip address 172.16.0.10 255.255.255.252\n!\ninterface FastEthernet0/2\n no switchport\n ip address 192.168.1.1 255.255.255.0\n ip helper-address 172.16.0.9\n!\ninterface FastEthernet0/3\n no switchport\n ip address 192.168.2.1 255.255.255.0\n!\nline vty 0 15\n transport input ssh\n login local\n!\nend"}]}, "rubric": {"simId": "BANK-S38", "points": 10, "elements": [{"id": "s38-r1-pat", "desc": "T1 NAT/PAT仕上げ(source list 192→Gi0/0 overload・inside/outside/ACL192は下地)", "weight": 3, "device": "R1", "section": "global", "expect": ["ip nat inside source list 192 interface GigabitEthernet0/0 overload"], "expectAbsent": [], "accept": []}, {"id": "s38-r1-ntp", "desc": "T2 NTPサーバ(ntp master・source Loopback0はPT非対応で省略)", "weight": 1, "device": "R1", "section": "global", "expect": ["ntp master"], "expectAbsent": [], "accept": []}, {"id": "s38-sw1-ntp", "desc": "T2 NTPクライアント(ntp server 172.16.0.9・PT fallback応答面)", "weight": 1, "device": "Sw1", "section": "global", "expect": ["ntp server 172.16.0.9"], "expectAbsent": [], "accept": []}, {"id": "s38-sw1-relay", "desc": "T3 DHCPリレー(Fa0/2 Sales側に helper-address 172.16.0.9)", "weight": 2, "device": "Sw1", "section": "interface", "expect": ["ip helper-address 172.16.0.9"], "expectAbsent": [], "accept": [], "interface": "FastEthernet0/2"}, {"id": "s38-sw1-sshv2", "desc": "T4 SSHv2有効化(ip ssh version 2)", "weight": 1, "device": "Sw1", "section": "global", "expect": ["ip ssh version 2"], "expectAbsent": [], "accept": []}, {"id": "s38-sw1-vty", "desc": "T4 vty 0-15 を transport input ssh＋login local", "weight": 2, "device": "Sw1", "section": "line-vty", "expect": ["transport input ssh", "login local"], "expectAbsent": [], "accept": []}]}, "derivation": {"added": {"R1": {"global": ["ip nat inside source list 192 interface GigabitEthernet0/0 overload", "ntp master"]}, "Sw1": {"global": ["ntp server 172.16.0.9", "ip ssh version 2"], "interface FastEthernet0/2": ["ip helper-address 172.16.0.9"], "line vty 0 15": ["transport input ssh", "login local"]}}, "removedState": {"R1": {}, "Sw1": {}}, "weightSum": 10, "unscored": [{"device": "Sw1", "section": "exec", "line": "crypto key generate rsa", "reason": "鍵生成は動的アクション＝show run非反映・非採点。SSH成立はvty/transport ssh/login local/username/ip ssh versionのprereq集合で担保"}]}}]}</script>
+<script type="application/json" id="app-config">{
+  "timeLimitSec": 6000,
+  "passRate": 0.9,
+  "gasEndpoint": "https://script.google.com/macros/s/AKfycbwz20axZy8IJDy_sWkwOIyLFFjylxJCpQUMj3qMNaQXGkNy3kxDKXH7ZXT55rlfiCA2eA/exec",
+  "token": "ccna-5a32df09cdb1d4c6c49d889b9d89d4aa",
+  "autosaveSec": 5,
+  "domainConfig": {
+    "NF": 12,
+    "NA": 12,
+    "IPConn": 15,
+    "IPSvc": 6,
+    "Sec": 9,
+    "Auto": 6
+  },
+  "setId": "M15",
+  "setName": "模試セット15"
+}</script>
+
+<!-- ====== 起動/名前入力 ====== -->
+<div id="screen-start" class="wrap">
+  <div class="card">
+    <h1>炎のCCNA 模擬試験②</h1>
+    <p><b>SIM 4問（各10点）→ 選択 60問（各1点）</b> ＝ 100点満点 / 合格 90点 / 制限時間 100分</p>
+    <div class="notice">本番同様、<b>「次へ」を押すと前の問題には戻れません</b>。問題の飛ばし読み・選び直しはできません。各問を完了してから次へ進んでください。SIMは設定後 <b>copy running-config startup-config</b> で保存しないと採点されません。</div>
+    <div id="resumeBox" class="hidden card" style="background:var(--panel2)">
+      <b>途中のデータが見つかりました。</b>
+      <div id="resumeInfo" class="small" style="margin:6px 0"></div>
+      <button class="btn" id="btnResume">Resume</button>
+      <button class="btn sec" id="btnDiscard">Discard and restart</button>
+    </div>
+    <div id="newBox">
+      <p>受験者名を入力してください（識別キー）：</p>
+      <input type="text" id="nameInput" placeholder="例: 宮崎 駿" autocomplete="off">
+      <div style="margin-top:14px"><button class="btn" id="btnStart" disabled>Start exam</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== 試験画面 ====== -->
+<div id="screen-exam" class="hidden">
+  <div id="examHeader">
+    <span class="brand">炎のCCNA 模擬②</span>
+    <span class="tag" id="hdrName">—</span>
+    <span class="tag" id="hdrMode">—</span>
+    <span class="tag" id="hdrPos">—</span>
+    <span class="sp"></span>
+    <span id="saveInd">保存済</span>
+    <span id="timer">--:--</span>
+  </div>
+  <div class="wrap">
+
+    <!-- 選択パート -->
+    <div id="pane-mcq">
+      <div class="qbox" id="qbox"></div>
+    </div>
+
+    <!-- SIMパート -->
+    <div id="pane-sim" class="hidden">
+      <div class="simwrap">
+        <div class="simleft">
+          <div class="subtabs" id="subtabs">
+            <button data-sub="topo" class="active">Topology</button>
+            <button data-sub="tasks">Tasks</button>
+            <button data-sub="guide">Guidelines</button>
+          </div>
+          <div id="sub-topo" class="subview">
+            <div class="topowrap" id="simTopo"></div>
+            <div class="small" id="simTopoRef" style="margin-top:8px"></div>
+          </div>
+          <div id="sub-tasks" class="subview hidden"><ol id="simReq"></ol></div>
+          <div id="sub-guide" class="subview hidden">
+            <h3 style="margin-top:0;color:var(--accent2)">ガイドライン</h3>
+            <p>このシミュレーションでは、トポロジ内の各機器をコンソールから設定します。</p>
+            <ul>
+              <li>右の機器タブで設定対象の機器を切り替えます（採点対象の機器のみ表示されます）。</li>
+              <li>コマンドは省略形・<code>?</code>・<code>Tab</code> 補完に対応します。</li>
+              <li>設定後は必ず <b>copy running-config startup-config</b>（=<code>write</code>）で保存してください。保存しないと0点です。</li>
+              <li><code>show running-config</code> / <code>show vlan brief</code> / <code>show ip interface brief</code> / <code>show interfaces status</code> などの確認コマンドで現在の設定を確認できます（保存前でも可）。</li>
+              <li>近隣探索は <code>show cdp neighbors</code> / <code>show lldp neighbors</code>、OSPF隣接は <code>show ip ospf neighbor</code> で簡易確認できます。</li>
+              <li>本演習は到達性（接続テスト）を模擬しません。</li>
+            </ul>
+          </div>
+        </div>
+        <div class="simright">
+          <div class="devtabs" id="devtabs"></div>
+          <div class="term">
+            <div class="termout" id="termout"></div>
+            <div class="terminline">
+              <span class="termprompt" id="termprompt">&gt;</span>
+              <input type="text" id="termin" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- 一方向ナビ -->
+  <div id="navbar">
+    <span id="navHint">この問題を終えたら「次へ」。前の問題には戻れません。</span>
+    <span class="sp"></span>
+    <button class="btn" id="btnNext" disabled>Next &rarr;</button>
+  </div>
+</div>
+
+<!-- ====== 結果画面 ====== -->
+<div id="screen-result" class="hidden wrap"></div>
+
+<script>
+/* =========================================================================
+   炎のCCNA DAY20 模試アプリ エンジン (T4)  v1.0 (本番試験スタイルCSS＋ボタン/タブ英語・ガイダンス日本語・前へ廃止・選択未回答でNext無効。トポロジ図/採点不変)
+   単一HTML・file://直開き・外部依存なし(ハッシュ=Web Crypto API)
+   - 出題順: SIM4問 → 選択60問。次へで前進のみ(戻れない・飛ばせない)
+   - 選択: answerHash(SHA-256)完全一致採点
+   - SIM : A- CLIエミュレータ(到達性なし) + startup照合・保存必須・部分点採点
+   正準化/文法/採点は附属v0.3・設計書v0.3に準拠
+   ========================================================================= */
+(function(){
+"use strict";
+
+function loadJSON(id, fallback){
+  try{ var t=document.getElementById(id).textContent.trim(); return t?JSON.parse(t):fallback; }
+  catch(e){ console.error("JSON parse fail",id,e); return fallback; }
+}
+
+/* =====================================================================
+   1. 正準化 (附属 §5)
+   ===================================================================== */
+function canonIfName(s){
+  if(!s) return null;
+  var pc=String(s).trim().match(/^(?:port-channel|po)\s*([0-9]+)$/i);
+  if(pc) return "Port-channel"+pc[1];
+  var m=String(s).trim().match(/^([a-zA-Z]+)\s*([0-9]+(?:\/[0-9]+)*(?:\.[0-9]+)?)$/);
+  if(!m) return null;
+  var a=m[1].toLowerCase(), num=m[2], full=null;
+  if(a[0]==='f' && 'fastethernet'.indexOf(a)===0) full='FastEthernet';
+  else if(a[0]==='g' && 'gigabitethernet'.indexOf(a)===0) full='GigabitEthernet';
+  else if(a[0]==='l' && 'loopback'.indexOf(a)===0) full='Loopback';
+  else if(a[0]==='e' && 'ethernet'.indexOf(a)===0) full='Ethernet';
+  else if(a[0]==='v' && 'vlan'.indexOf(a)===0) full='Vlan';
+  else return null;
+  return full+num;
+}
+function canonVlanList(s){
+  var set={};
+  String(s).split(',').forEach(function(p){
+    p=p.trim(); if(!p) return;
+    if(p.indexOf('-')>=0){ var ab=p.split('-'); var a=parseInt(ab[0],10),b=parseInt(ab[1],10);
+      for(var i=a;i<=b;i++) set[i]=1; }
+    else set[parseInt(p,10)]=1;
+  });
+  var arr=Object.keys(set).map(Number).sort(function(x,y){return x-y;});
+  var out=[],i=0;
+  while(i<arr.length){
+    var st=arr[i],en=arr[i];
+    while(i+1<arr.length && arr[i+1]===en+1){en=arr[i+1];i++;}
+    out.push(st===en?String(st):(st+"-"+en)); i++;
+  }
+  return out.join(',');
+}
+function canonIpv6(s){
+  var sp=String(s).split('/'); var addr=sp[0].toLowerCase(); var plen=sp[1];
+  var dbl=addr.indexOf('::');
+  var groups;
+  if(dbl>=0){
+    var head=addr.slice(0,dbl).split(':').filter(function(x){return x!=='';});
+    var tail=addr.slice(dbl+2).split(':').filter(function(x){return x!=='';});
+    var miss=8-head.length-tail.length; var mid=[];
+    for(var i=0;i<miss;i++) mid.push('0');
+    groups=head.concat(mid).concat(tail);
+  }else{
+    groups=addr.split(':');
+  }
+  groups=groups.map(function(g){ g=g.replace(/^0+/,''); return g===''?'0':g; });
+  while(groups.length<8) groups.push('0'); groups=groups.slice(0,8);
+  var bestS=-1,bestL=0,curS=-1,curL=0;
+  for(var i=0;i<8;i++){
+    if(groups[i]==='0'){ if(curS<0){curS=i;curL=1;}else curL++; if(curL>bestL){bestL=curL;bestS=curS;} }
+    else { curS=-1;curL=0; }
+  }
+  var res;
+  if(bestL>=2){
+    var left=groups.slice(0,bestS).join(':');
+    var right=groups.slice(bestS+bestL).join(':');
+    res=left+'::'+right;
+  }else{ res=groups.join(':'); }
+  return res+(plen!==undefined?('/'+plen):'');
+}
+function canonArea(s){
+  s=String(s).trim();
+  if(/^[0-9]+$/.test(s)) return s;
+  var m=s.match(/^(\d+)\.(\d+)\.(\d+)\.(\d+)$/);
+  if(m) return String(Number(m[1])*16777216+Number(m[2])*65536+Number(m[3])*256+Number(m[4]));
+  return s;
+}
+function squashWs(s){ return String(s).replace(/\s+/g,' ').trim(); }
+/* ACE(アクセスリストエントリ)正準化: action/proto小文字・host/wildcard/any正規化・eqポートはIOS show名に正準化(23→telnet等)。
+   §3c ACL族。順序は採点側(scoreSim)で順序付き部分列照合するため、ここでは1ACE=1正準文字列に揃えるのみ。 */
+var PORT_N2NAME={'20':'ftp-data','21':'ftp','23':'telnet','25':'smtp','37':'time','42':'nameserver','43':'whois','49':'tacacs','53':'domain','67':'bootps','68':'bootpc','69':'tftp','70':'gopher','79':'finger','80':'www','101':'hostname','109':'pop2','110':'pop3','111':'sunrpc','113':'ident','119':'nntp','123':'ntp','179':'bgp','194':'irc','496':'pim-auto-rp','512':'biff','513':'who','514':'syslog','515':'lpd','517':'talk','520':'rip','540':'uucp','543':'klogin','544':'kshell'};
+function canonPort(p){ if(p===undefined||p===null) return p; p=String(p).toLowerCase(); if(/^\d+$/.test(p)) return PORT_N2NAME[p]||p; return p; }
+function canonAce(s){
+  var toks=squashWs(s).split(' ');
+  if(toks.length<2) return squashWs(s);
+  var act=toks[0].toLowerCase();
+  if(act!=='permit'&&act!=='deny') return squashWs(s);
+  var proto=toks[1].toLowerCase(); var i=2; var out=[act,proto];
+  function addr(){
+    if(i>=toks.length) return;
+    var t0=toks[i].toLowerCase();
+    if(t0==='any'){ out.push('any'); i++; }
+    else if(t0==='host'){ out.push('host'); out.push(toks[i+1]); i+=2; }
+    else { out.push(toks[i]); out.push(toks[i+1]); i+=2; }
+  }
+  function oper(){
+    if(i>=toks.length) return;
+    var op=toks[i].toLowerCase();
+    if(op==='eq'||op==='gt'||op==='lt'||op==='neq'){ out.push(op); out.push(canonPort(toks[i+1])); i+=2; }
+    else if(op==='range'){ out.push('range'); out.push(canonPort(toks[i+1])); out.push(canonPort(toks[i+2])); i+=3; }
+  }
+  addr(); oper();   // 送信元
+  addr(); oper();   // 宛先
+  while(i<toks.length){ out.push(toks[i].toLowerCase()); i++; }   // icmpタイプ(echo等)・log/log-input・established 等
+  return out.join(' ');
+}
+
+/* =====================================================================
+   2. config 構造体  parse / render
+   ===================================================================== */
+function newCfg(){ return {hostname:"",global:[],vlans:{},ifs:{},ospf:null,acls:{},linevty:[]}; }
+function cloneCfg(c){ return JSON.parse(JSON.stringify(c)); }
+
+function parseConfig(text){
+  var cfg=newCfg();
+  var sec={t:'g'};
+  String(text||"").split('\n').forEach(function(raw){
+    var line=raw.replace(/\s+$/,'');
+    if(line==='') return;
+    if(line.trim()==='!'){ sec={t:'g'}; return; }
+    if(line.trim()==='end'){ sec={t:'g'}; return; }
+    var indented=/^\s/.test(line);
+    var t=line.trim();
+    if(!indented){
+      var mm;
+      if((mm=t.match(/^hostname\s+(\S+)/))){ cfg.hostname=mm[1]; sec={t:'g'}; }
+      else if((mm=t.match(/^interface\s+(.+)/))){ var nm=canonIfName(mm[1])||mm[1].trim();
+        if(!cfg.ifs[nm]) cfg.ifs[nm]={lines:[],shutdown:false}; sec={t:'if',name:nm}; }
+      else if((mm=t.match(/^vlan\s+(\d+)/))){ var id=mm[1]; if(!cfg.vlans[id]) cfg.vlans[id]=[]; sec={t:'vlan',id:id}; }
+      else if((mm=t.match(/^router\s+ospf\s+(\d+)/))){ cfg.ospf={pid:mm[1],lines:[]}; sec={t:'ospf'}; }
+      else if((mm=t.match(/^ip\s+access-list\s+(?:standard|extended)\s+(\S+)/))){ var an=mm[1]; if(!cfg.acls[an]) cfg.acls[an]=[]; sec={t:'acl',name:an}; }
+      else if((mm=t.match(/^line\s+/))){ sec={t:'line'}; }
+      else { cfg.global.push(squashWs(t)); }
+    }else{
+      var c=squashWs(t);
+      if(sec.t==='if'){
+        if(c==='shutdown'){ cfg.ifs[sec.name].shutdown=true; }
+        else if(c==='no shutdown'){ cfg.ifs[sec.name].shutdown=false; }
+        else pushUniq(cfg.ifs[sec.name].lines,c);
+      } else if(sec.t==='vlan'){ pushUniq(cfg.vlans[sec.id],c); }
+      else if(sec.t==='ospf'){ pushUniq(cfg.ospf.lines,c); }
+      else if(sec.t==='acl'){ var ace=canonAce(c); if(cfg.acls[sec.name].indexOf(ace)<0) cfg.acls[sec.name].push(ace); }
+      else if(sec.t==='line'){ pushUniq(cfg.linevty,c); }
+      else cfg.global.push(c);
+    }
+  });
+  return cfg;
+}
+function pushUniq(arr,l){ if(arr.indexOf(l)<0) arr.push(l); }
+function replacePrefix(arr,prefix,line){
+  for(var i=arr.length-1;i>=0;i--){ if(arr[i].indexOf(prefix)===0) arr.splice(i,1); }
+  if(line!==null) arr.push(line);
+}
+function renderConfig(cfg){
+  var L=[]; L.push("hostname "+(cfg.hostname||"Router")); L.push("!");
+  cfg.global.forEach(function(g){ L.push(g); }); if(cfg.global.length) L.push("!");
+  Object.keys(cfg.vlans).map(Number).sort(function(a,b){return a-b;}).forEach(function(id){
+    L.push("vlan "+id); cfg.vlans[id].forEach(function(x){ L.push(" "+x); }); L.push("!");
+  });
+  Object.keys(cfg.ifs).sort().forEach(function(nm){
+    var f=cfg.ifs[nm]; L.push("interface "+nm);
+    f.lines.forEach(function(x){ L.push(" "+x); });
+    if(f.shutdown) L.push(" shutdown");
+    L.push("!");
+  });
+  if(cfg.ospf){ L.push("router ospf "+cfg.ospf.pid); cfg.ospf.lines.forEach(function(x){ L.push(" "+x); }); L.push("!"); }
+  if(cfg.acls){ Object.keys(cfg.acls).forEach(function(an){ L.push("ip access-list extended "+an); cfg.acls[an].forEach(function(x){ L.push(" "+x); }); L.push("!"); }); }
+  if(cfg.linevty && cfg.linevty.length){ L.push("line vty 0 4"); cfg.linevty.forEach(function(x){ L.push(" "+x); }); L.push("!"); }
+  L.push("end"); return L.join('\n');
+}
+
+/* =====================================================================
+   3. 文法ツリー (附属 §2/§3) ＝ モード別ルート集合
+   ===================================================================== */
+function K(t,help,opts){ opts=opts||{}; return {t:t,p:null,help:help,neg:!!opts.neg,children:opts.c||[],act:opts.act||null}; }
+function P(type,help,opts){ opts=opts||{}; return {t:null,p:type,help:help,neg:!!opts.neg,children:opts.c||[],act:opts.act||null}; }
+
+function curIfaces(ctx){
+  if(ctx.mode==='interface') return [ctx.ctxIf];
+  if(ctx.mode==='interface-range') return ctx.ctxRange.slice();
+  return [];
+}
+function applyIf(ctx,fn){ curIfaces(ctx).forEach(function(nm){ var f=ctx.cfg.ifs[nm]; if(f) fn(f,nm); }); }
+
+function buildGrammar(){
+  function doSave(ctx,v,neg,out){ ctx.startup=cloneCfg(ctx.cfg); out.push("Building configuration..."); out.push("[OK]"); }
+  var privCmds=[
+    K("enable","特権EXECへ",{act:function(ctx){ ctx.mode='priv'; ctx.stack=[]; }}),
+    K("disable","ユーザEXECへ",{act:function(ctx){ ctx.mode='user'; ctx.stack=[]; }}),
+    K("configure","端末から設定",{c:[ K("terminal","端末設定モード",{act:function(ctx){ ctx.pushMode('global'); }}) ]}),
+    K("copy","コピー",{c:[ K("running-config","running",{c:[ K("startup-config","→startup(保存)",{act:doSave}) ]}) ]}),
+    K("write","running→startup(保存)",{act:doSave, c:[ K("memory","保存",{act:doSave}) ]}),
+    K("show","表示",{c:[
+      K("running-config","現在の設定",{act:function(ctx,v,neg,out){ out.push(renderConfig(ctx.cfg)); }}),
+      K("startup-config","保存済設定",{act:function(ctx,v,neg,out){ out.push(renderConfig(ctx.startup)); }}),
+      K("vlan","VLAN情報",{c:[ K("brief","VLAN一覧",{act:function(ctx,v,neg,out){ showVlanBrief(ctx,out); }}) ]}),
+      K("interfaces","インターフェース",{c:[ K("status","ポート状態",{act:function(ctx,v,neg,out){ showIntfStatus(ctx,out); }}) ]}),
+      K("ip","IP情報",{c:[
+        K("interface","IPインターフェース",{c:[ K("brief","IP概要",{act:function(ctx,v,neg,out){ showIpIntBrief(ctx,out); }}) ]}),
+        K("ospf","OSPF情報",{c:[ K("neighbor","OSPF隣接",{act:function(ctx,v,neg,out){ showOspfNei(ctx,out); }}) ]})
+      ]}),
+      K("cdp","CDP情報",{c:[ K("neighbors","CDP隣接",{act:function(ctx,v,neg,out){ showCdpNei(ctx,out); }}) ]}),
+      K("lldp","LLDP情報",{c:[ K("neighbors","LLDP隣接",{act:function(ctx,v,neg,out){ showLldpNei(ctx,out); }}) ]})
+    ]}),
+    K("clear","クリア",{c:[ K("ip","",{c:[ K("ospf","",{c:[ K("process","OSPFプロセス再起動",{act:function(ctx,v,neg,out){ ctx.confirm={msg:"Reset ALL OSPF processes? [no]: ",def:"no"}; }}) ]}) ]}) ]})
+  ];
+
+  var ifChildren=[
+    K("switchport","スイッチポート",{neg:true,act:function(ctx,v,neg){ applyIf(ctx,function(f){ if(neg) pushUniq(f.lines,"no switchport"); else replacePrefix(f.lines,"no switchport",null); }); },c:[
+      K("mode","モード",{c:[
+        K("access","アクセス",{act:function(ctx){ applyIf(ctx,function(f){ replacePrefix(f.lines,"switchport mode ","switchport mode access"); }); }}),
+        K("trunk","トランク",{act:function(ctx){ applyIf(ctx,function(f){ replacePrefix(f.lines,"switchport mode ","switchport mode trunk"); }); }})
+      ]}),
+      K("access","アクセス",{c:[ K("vlan","所属VLAN",{c:[ P("vlanId","<1-4094>",{act:function(ctx,v){ applyIf(ctx,function(f){ replacePrefix(f.lines,"switchport access vlan ","switchport access vlan "+v); }); }}) ]}) ]}),
+      K("voice","音声VLAN",{c:[ K("vlan","音声VLAN ID",{c:[ P("vlanId","<1-4094>",{act:function(ctx,v){ applyIf(ctx,function(f){ replacePrefix(f.lines,"switchport voice vlan ","switchport voice vlan "+v); }); }}) ]}) ]}),
+      K("port-security","ポートセキュリティ有効",{act:function(ctx){ applyIf(ctx,function(f){ pushUniq(f.lines,"switchport port-security"); }); },c:[
+        K("maximum","最大セキュアMAC数",{c:[ P("psMax","<n>",{act:function(ctx,v){ applyIf(ctx,function(f){ replacePrefix(f.lines,"switchport port-security maximum ","switchport port-security maximum "+v); }); }}) ]}),
+        K("violation","違反モード",{c:[
+          K("protect","破棄のみ(通知無)",{act:function(ctx){ applyIf(ctx,function(f){ replacePrefix(f.lines,"switchport port-security violation ","switchport port-security violation protect"); }); }}),
+          K("restrict","破棄+ログ",{act:function(ctx){ applyIf(ctx,function(f){ replacePrefix(f.lines,"switchport port-security violation ","switchport port-security violation restrict"); }); }}),
+          K("shutdown","err-disable",{act:function(ctx){ applyIf(ctx,function(f){ replacePrefix(f.lines,"switchport port-security violation ","switchport port-security violation shutdown"); }); }})
+        ]}),
+        K("mac-address","セキュアMAC",{c:[ K("sticky","動的学習(sticky)",{act:function(ctx){ applyIf(ctx,function(f){ pushUniq(f.lines,"switchport port-security mac-address sticky"); }); }}) ]})
+      ]}),
+      K("trunk","トランク",{c:[
+        K("encapsulation","カプセル化",{c:[ K("dot1q","802.1Q",{act:function(ctx){ applyIf(ctx,function(f){ replacePrefix(f.lines,"switchport trunk encapsulation ","switchport trunk encapsulation dot1q"); }); }}) ]}),
+        K("allowed","許可VLAN",{c:[ K("vlan","VLAN",{c:[
+          P("vlanList","<vlan list>",{act:function(ctx,v){ setTrunkAllowed(ctx,'set',v); }}),
+          K("add","追加",{c:[ P("vlanList","",{act:function(ctx,v){ setTrunkAllowed(ctx,'add',v); }}) ]}),
+          K("remove","削除",{c:[ P("vlanList","",{act:function(ctx,v){ setTrunkAllowed(ctx,'remove',v); }}) ]}),
+          K("all","全て",{act:function(ctx){ setTrunkAllowed(ctx,'all'); }}),
+          K("none","なし",{act:function(ctx){ setTrunkAllowed(ctx,'none'); }})
+        ]}) ]}),
+        K("native","ネイティブVLAN",{c:[ K("vlan","VLAN",{c:[ P("vlanId","<1-4094>",{act:function(ctx,v){ applyIf(ctx,function(f){ replacePrefix(f.lines,"switchport trunk native vlan ","switchport trunk native vlan "+v); }); }}) ]}) ]})
+      ]})
+    ]}),
+    K("cdp","CDP",{neg:true,c:[ K("enable","IFでCDP有効",{neg:true,act:function(ctx,v,neg){ applyIf(ctx,function(f){ if(neg) pushUniq(f.lines,"no cdp enable"); else replacePrefix(f.lines,"no cdp enable",null); }); }}) ]}),
+    K("lldp","LLDP",{c:[
+      K("transmit","LLDP送信",{neg:true,act:function(ctx,v,neg){ applyIf(ctx,function(f){ if(neg) pushUniq(f.lines,"no lldp transmit"); else replacePrefix(f.lines,"no lldp transmit",null); }); }}),
+      K("receive","LLDP受信",{neg:true,act:function(ctx,v,neg){ applyIf(ctx,function(f){ if(neg) pushUniq(f.lines,"no lldp receive"); else replacePrefix(f.lines,"no lldp receive",null); }); }})
+    ]}),
+    K("ip","IP",{c:[
+      K("address","IPアドレス",{c:[ P("ipv4","A.B.C.D",{c:[ P("ipv4mask","マスク",{act:function(ctx,v,neg,out,vals){ applyIf(ctx,function(f){ replacePrefix(f.lines,"ip address ","ip address "+vals.ipv4+" "+vals.ipv4mask); }); }}) ]}), K("dhcp","DHCPクライアント(動的取得)",{act:function(ctx){ applyIf(ctx,function(f){ replacePrefix(f.lines,"ip address ","ip address dhcp"); }); }}) ]}),
+      K("nat","NAT変換境界",{c:[
+        K("inside","内部(inside)",{act:function(ctx){ applyIf(ctx,function(f){ pushUniq(f.lines,"ip nat inside"); }); }}),
+        K("outside","外部(outside)",{act:function(ctx){ applyIf(ctx,function(f){ pushUniq(f.lines,"ip nat outside"); }); }})
+      ]}),
+      K("helper-address","DHCPリレー先",{c:[ P("ipv4","A.B.C.D",{act:function(ctx,v){ applyIf(ctx,function(f){ pushUniq(f.lines,"ip helper-address "+v); }); }}) ]}),
+      K("ospf","OSPF",{c:[
+        K("priority","プライオリティ",{c:[ P("priority","<0-255>",{act:function(ctx,v){ applyIf(ctx,function(f){ replacePrefix(f.lines,"ip ospf priority ","ip ospf priority "+v); }); }}) ]}),
+        K("network","ネットワークタイプ",{c:[ K("point-to-point","ポイントツーポイント",{act:function(ctx){ applyIf(ctx,function(f){ replacePrefix(f.lines,"ip ospf network ","ip ospf network point-to-point"); }); }}) ]}),
+        P("ospfPid","<1-65535>(インタフェース方式)",{c:[ K("area","エリア",{c:[ P("area","<area>",{act:function(ctx,v,neg,out,vals){ applyIf(ctx,function(f){ for(var i=f.lines.length-1;i>=0;i--){ if(/^ip ospf \d+ area /.test(f.lines[i])) f.lines.splice(i,1); } pushUniq(f.lines,"ip ospf "+vals.ospfPid+" area "+canonArea(v)); }); }}) ]}) ]})
+      ]}),
+      K("access-group","ACL適用",{c:[ P("aclName","ACL名",{c:[
+        K("in","入力方向",{act:function(ctx,v,neg,out,vals){ applyIf(ctx,function(f){ pushUniq(f.lines,"ip access-group "+vals.aclName+" in"); }); }}),
+        K("out","出力方向",{act:function(ctx,v,neg,out,vals){ applyIf(ctx,function(f){ pushUniq(f.lines,"ip access-group "+vals.aclName+" out"); }); }})
+      ]}) ]}),
+      K("dhcp","DHCP",{c:[ K("snooping","スヌーピング",{c:[ K("trust","信頼ポート",{act:function(ctx){ applyIf(ctx,function(f){ pushUniq(f.lines,"ip dhcp snooping trust"); }); }}) ]}) ]})
+    ]}),
+    K("encapsulation","カプセル化(サブIF)",{c:[ K("dot1Q","802.1Q",{c:[ P("vlanId","VLAN ID",{act:function(ctx,v){ applyIf(ctx,function(f){ replacePrefix(f.lines,"encapsulation dot1Q ","encapsulation dot1Q "+v); }); }}) ]}), K("dot1q","802.1Q",{c:[ P("vlanId","VLAN ID",{act:function(ctx,v){ applyIf(ctx,function(f){ replacePrefix(f.lines,"encapsulation dot1Q ","encapsulation dot1Q "+v); }); }}) ]}) ]}),
+    K("ipv6","IPv6",{c:[ K("address","IPv6アドレス",{c:[ P("ipv6prefix","X:X:X:X::X/長",{act:function(ctx,v){ applyIf(ctx,function(f){ replacePrefix(f.lines,"ipv6 address ","ipv6 address "+canonIpv6(v)); }); },c:[ K("eui-64","EUI-64(ホスト部自動生成)",{act:function(ctx,v,neg,out,vals){ applyIf(ctx,function(f){ replacePrefix(f.lines,"ipv6 address ","ipv6 address "+canonIpv6(vals.ipv6prefix)+" eui-64"); }); }}) ]}) ]}) ]}),
+    K("description","説明(表示用)",{c:[ P("word","説明文(1語)",{act:function(ctx,v){ applyIf(ctx,function(f){ replacePrefix(f.lines,"description ","description "+v); }); }}) ]}),
+    K("duplex","デュプレックス(表示用)",{c:[
+      K("auto","自動",{act:function(ctx){ applyIf(ctx,function(f){ replacePrefix(f.lines,"duplex ","duplex auto"); }); }}),
+      K("full","全二重",{act:function(ctx){ applyIf(ctx,function(f){ replacePrefix(f.lines,"duplex ","duplex full"); }); }}),
+      K("half","半二重",{act:function(ctx){ applyIf(ctx,function(f){ replacePrefix(f.lines,"duplex ","duplex half"); }); }})
+    ]}),
+    K("speed","速度(表示用)",{c:[
+      K("auto","自動",{act:function(ctx){ applyIf(ctx,function(f){ replacePrefix(f.lines,"speed ","speed auto"); }); }}),
+      K("10","10Mbps",{act:function(ctx){ applyIf(ctx,function(f){ replacePrefix(f.lines,"speed ","speed 10"); }); }}),
+      K("100","100Mbps",{act:function(ctx){ applyIf(ctx,function(f){ replacePrefix(f.lines,"speed ","speed 100"); }); }}),
+      K("1000","1Gbps",{act:function(ctx){ applyIf(ctx,function(f){ replacePrefix(f.lines,"speed ","speed 1000"); }); }})
+    ]}),
+    K("mtu","MTU(表示用)",{c:[ P("word","<n>",{act:function(ctx,v){ applyIf(ctx,function(f){ replacePrefix(f.lines,"mtu ","mtu "+v); }); }}) ]}),
+    K("channel-group","EtherChannel割当",{c:[ P("channelNum","<1-4096>",{c:[ K("mode","モード",{c:[
+      K("active","LACP(active)",{act:function(ctx,v,neg,out,vals){ applyIf(ctx,function(f){ replacePrefix(f.lines,"channel-group ","channel-group "+vals.channelNum+" mode active"); }); }}),
+      K("passive","LACP(passive)",{act:function(ctx,v,neg,out,vals){ applyIf(ctx,function(f){ replacePrefix(f.lines,"channel-group ","channel-group "+vals.channelNum+" mode passive"); }); }}),
+      K("on","ON(無条件・静的)",{act:function(ctx,v,neg,out,vals){ applyIf(ctx,function(f){ replacePrefix(f.lines,"channel-group ","channel-group "+vals.channelNum+" mode on"); }); }})
+    ]}) ]}) ]}),
+    K("shutdown","IF停止",{neg:true,act:function(ctx,v,neg){ applyIf(ctx,function(f){ f.shutdown=!neg; }); }}),
+    K("exit","1つ上のモードへ",{act:function(ctx){ ctx.popMode(); }}),
+    K("end","特権EXECへ",{act:function(ctx){ ctx.endMode(); }})
+  ];
+  function setTrunkAllowed(ctx,op,v){
+    applyIf(ctx,function(f){
+      var cur=""; for(var i=0;i<f.lines.length;i++){ var m=f.lines[i].match(/^switchport trunk allowed vlan (.+)/); if(m){cur=m[1];break;} }
+      var set={};
+      if(op==='set'){ set={}; canonVlanList(v).split(',').forEach(function(x){if(x)set[x]=1;}); }
+      else if(op==='all'){ replacePrefix(f.lines,"switchport trunk allowed vlan ","switchport trunk allowed vlan all"); return; }
+      else if(op==='none'){ replacePrefix(f.lines,"switchport trunk allowed vlan ","switchport trunk allowed vlan none"); return; }
+      else {
+        if(cur && cur!=='all' && cur!=='none') canonVlanList(cur).split(',').forEach(function(x){if(x)set[x]=1;});
+        var add=canonVlanList(v).split(',');
+        if(op==='add') add.forEach(function(x){if(x)set[x]=1;});
+        if(op==='remove') add.forEach(function(x){delete set[x];});
+      }
+      var list=canonVlanList(Object.keys(set).join(','));
+      replacePrefix(f.lines,"switchport trunk allowed vlan ","switchport trunk allowed vlan "+list);
+    });
+  }
+
+  var globalCmds=[
+    K("hostname","ホスト名",{c:[ P("word","名前",{act:function(ctx,v){ ctx.cfg.hostname=v; }}) ]}),
+    K("vlan","VLAN作成",{neg:true,c:[ P("vlanId","<1-4094>",{act:function(ctx,v,neg){ if(neg){ delete ctx.cfg.vlans[v]; } else { if(!ctx.cfg.vlans[v]) ctx.cfg.vlans[v]=[]; ctx.pushMode('vlan'); ctx.ctxVlan=String(v); } }}) ]}),
+    K("interface","インターフェース",{c:[
+      K("range","範囲指定",{c:[ P("ifRange","IF範囲",{act:function(ctx,v,neg,out,vals){ ctx.pushMode('interface-range'); ctx.ctxRange=vals.__range; ctx.ctxRange.forEach(function(nm){ if(!ctx.cfg.ifs[nm]) ctx.cfg.ifs[nm]={lines:[],shutdown:false}; }); }}) ]}),
+      K("Port-channel","ポートチャネル(論理IF)",{c:[ P("poNum","<1-4096>",{act:function(ctx,v){ var nm="Port-channel"+v; if(!ctx.cfg.ifs[nm]) ctx.cfg.ifs[nm]={lines:[],shutdown:false}; ctx.pushMode('interface'); ctx.ctxIf=nm; }}) ]}),
+      K("vlan","SVI(VLANインタフェース)",{c:[ P("vlanId","<1-4094>",{act:function(ctx,v){ var nm="Vlan"+v; if(!ctx.cfg.ifs[nm]) ctx.cfg.ifs[nm]={lines:[],shutdown:false}; ctx.pushMode('interface'); ctx.ctxIf=nm; }}) ]}),
+      P("ifName","IF名",{act:function(ctx,v){ var nm=canonIfName(v); if(!ctx.cfg.ifs[nm]) ctx.cfg.ifs[nm]={lines:[],shutdown:false}; ctx.pushMode('interface'); ctx.ctxIf=nm; }})
+    ]}),
+    K("cdp","CDP",{neg:true,c:[ K("run","CDPグローバル有効(既定ON)",{neg:true,act:function(ctx,v,neg){ if(neg) pushUniq(ctx.cfg.global,"no cdp run"); else replacePrefix(ctx.cfg.global,"no cdp run",null); }}) ]}),
+    K("lldp","LLDP",{neg:true,c:[ K("run","LLDPグローバル有効",{neg:true,act:function(ctx,v,neg){ if(neg) replacePrefix(ctx.cfg.global,"lldp run",null); else pushUniq(ctx.cfg.global,"lldp run"); }}) ]}),
+    K("router","ルーティング",{c:[ K("ospf","OSPF",{c:[ P("ospfPid","<1-65535>",{act:function(ctx,v){ if(!ctx.cfg.ospf) ctx.cfg.ospf={pid:String(v),lines:[]}; else ctx.cfg.ospf.pid=String(v); ctx.pushMode('router-ospf'); }}) ]}) ]}),
+    K("banner","バナー(表示用)",{c:[ K("motd","MOTDバナー",{c:[ P("word","区切り文字+文言",{act:function(ctx,v){ pushUniq(ctx.cfg.global,"banner motd "+v); }}) ]}) ]}),
+    K("ntp","NTP",{c:[
+      K("server","NTPサーバ参照(クライアント)",{c:[ P("ipv4","A.B.C.D",{act:function(ctx,v){ pushUniq(ctx.cfg.global,"ntp server "+v); }}) ]}),
+      K("master","NTPマスター(基準クロック)",{act:function(ctx){ replacePrefix(ctx.cfg.global,"ntp master","ntp master"); },c:[ P("priority","<1-15>stratum",{act:function(ctx,v){ replacePrefix(ctx.cfg.global,"ntp master","ntp master "+v); }}) ]}),
+      K("source","NTP送信元IF",{c:[ P("ifName","IF名",{act:function(ctx,v){ replacePrefix(ctx.cfg.global,"ntp source ","ntp source "+(canonIfName(v)||v)); }}) ]})
+    ]}),
+    K("service","サービス(表示用)",{c:[ K("password-encryption","パスワード暗号化",{act:function(ctx){ pushUniq(ctx.cfg.global,"service password-encryption"); }}) ]}),
+    K("logging","ログ(表示用)",{c:[ K("host","Syslogホスト",{c:[ P("ipv4","A.B.C.D",{act:function(ctx,v){ pushUniq(ctx.cfg.global,"logging host "+v); }}) ]}) ]}),
+    K("ip","IP関連(表示用)",{c:[
+      K("nat","NAT",{c:[
+        K("inside","内部側",{c:[ K("source","送信元変換",{c:[ K("list","ACL参照",{c:[ P("aclName","ACL名/番号",{c:[
+          K("interface","出力IFのIPへ(PAT)",{c:[ P("ifName","IF名",{c:[ K("overload","PAT(多重化)",{act:function(ctx,v,neg,out,vals){ pushUniq(ctx.cfg.global,"ip nat inside source list "+vals.aclName+" interface "+(canonIfName(vals.ifName)||vals.ifName)+" overload"); }}) ]}) ]}),
+          K("pool","プール参照(動的1:1)",{c:[ P("word","プール名",{act:function(ctx,v,neg,out,vals){ pushUniq(ctx.cfg.global,"ip nat inside source list "+vals.aclName+" pool "+v); },c:[ K("overload","PAT",{act:function(ctx,v,neg,out,vals){ pushUniq(ctx.cfg.global,"ip nat inside source list "+vals.aclName+" pool "+vals.word+" overload"); }}) ]}) ]})
+        ]}) ]}) ]}) ]}),
+        K("pool","NATプール定義",{c:[ P("word","プール名",{c:[ P("ipv4","開始 A.B.C.D",{c:[ P("staticNH","終了 A.B.C.D",{c:[ K("netmask","ネットマスク",{c:[ P("ipv4mask","マスク",{act:function(ctx,v,neg,out,vals){ pushUniq(ctx.cfg.global,"ip nat pool "+vals.word+" "+vals.ipv4+" "+vals.staticNH+" netmask "+vals.ipv4mask); }}) ]}) ]}) ]}) ]}) ]})
+      ]}),
+      K("ssh","SSH設定",{c:[ K("version","SSHバージョン",{c:[
+        K("2","v2",{act:function(ctx){ replacePrefix(ctx.cfg.global,"ip ssh version ","ip ssh version 2"); }}),
+        K("1","v1",{act:function(ctx){ replacePrefix(ctx.cfg.global,"ip ssh version ","ip ssh version 1"); }})
+      ]}) ]}),
+      K("domain-name","ドメイン名",{c:[ P("word","WORD",{act:function(ctx,v){ pushUniq(ctx.cfg.global,"ip domain-name "+v); }}) ]}),
+      K("name-server","DNSサーバ",{c:[ P("ipv4","A.B.C.D",{act:function(ctx,v){ pushUniq(ctx.cfg.global,"ip name-server "+v); }}) ]}),
+      K("access-list","名前付きACL",{c:[
+        K("extended","拡張ACL",{c:[ P("aclName","ACL名",{act:function(ctx,v){ if(!ctx.cfg.acls[v]) ctx.cfg.acls[v]=[]; ctx.pushMode('ext-nacl'); ctx.ctxAcl=v; }}) ]}),
+        K("standard","標準ACL",{c:[ P("aclName","ACL名",{act:function(ctx,v){ if(!ctx.cfg.acls[v]) ctx.cfg.acls[v]=[]; ctx.pushMode('ext-nacl'); ctx.ctxAcl=v; }}) ]})
+      ]}),
+      K("dhcp","DHCP",{c:[
+        K("pool","DHCPプール定義",{c:[ P("word","プール名",{act:function(ctx,v){ pushUniq(ctx.cfg.global,"ip dhcp pool "+v); ctx.pushMode('dhcp'); }}) ]}),
+        K("excluded-address","除外アドレス",{c:[ P("ipv4","開始 A.B.C.D",{act:function(ctx,v){ pushUniq(ctx.cfg.global,"ip dhcp excluded-address "+v); },c:[ P("staticNH","終了 A.B.C.D",{act:function(ctx,v,neg,out,vals){ pushUniq(ctx.cfg.global,"ip dhcp excluded-address "+vals.ipv4+" "+vals.staticNH); }}) ]}) ]}),
+        K("snooping","DHCPスヌーピング有効",{act:function(ctx){ pushUniq(ctx.cfg.global,"ip dhcp snooping"); },c:[
+        K("vlan","対象VLAN",{c:[ P("vlanList","VLANリスト",{act:function(ctx,v){ replacePrefix(ctx.cfg.global,"ip dhcp snooping vlan ","ip dhcp snooping vlan "+canonVlanList(v)); }}) ]}),
+        K("information","Option82",{c:[ K("option","挿入",{neg:true,act:function(ctx,v,neg){ if(neg) pushUniq(ctx.cfg.global,"no ip dhcp snooping information option"); else replacePrefix(ctx.cfg.global,"no ip dhcp snooping information option",null); }}) ]}),
+        K("verify","MAC検証",{c:[ K("mac-address","送信元MAC一致検証",{act:function(ctx){ pushUniq(ctx.cfg.global,"ip dhcp snooping verify mac-address"); }}) ]})
+      ]}) ]}),
+      K("route","静的ルート",{c:[ P("staticPrefix","宛先ネットワーク A.B.C.D",{c:[ P("staticMask","サブネットマスク",{c:[
+        P("staticNH","ネクストホップ A.B.C.D",{act:function(ctx,v,neg,out,vals){ pushUniq(ctx.cfg.global,"ip route "+vals.staticPrefix+" "+vals.staticMask+" "+vals.staticNH); },c:[
+          P("staticAD","AD<1-255>(任意)",{act:function(ctx,v,neg,out,vals){ pushUniq(ctx.cfg.global,"ip route "+vals.staticPrefix+" "+vals.staticMask+" "+vals.staticNH+" "+vals.staticAD); }}) ]}),
+        P("ifName","出力インターフェース",{act:function(ctx,v,neg,out,vals){ pushUniq(ctx.cfg.global,"ip route "+vals.staticPrefix+" "+vals.staticMask+" "+(canonIfName(vals.ifName)||vals.ifName)); },c:[
+          P("staticAD","AD<1-255>(任意)",{act:function(ctx,v,neg,out,vals){ pushUniq(ctx.cfg.global,"ip route "+vals.staticPrefix+" "+vals.staticMask+" "+(canonIfName(vals.ifName)||vals.ifName)+" "+vals.staticAD); }}) ]}),
+        K("Null0","破棄(ブラックホール)",{act:function(ctx,v,neg,out,vals){ pushUniq(ctx.cfg.global,"ip route "+vals.staticPrefix+" "+vals.staticMask+" Null0"); }})
+      ]}) ]}) ]})
+    ]}),
+    K("ipv6","IPv6(グローバル)",{c:[
+      K("unicast-routing","IPv6ユニキャストルーティング有効",{neg:true,act:function(ctx,v,neg){ if(neg) replacePrefix(ctx.cfg.global,"ipv6 unicast-routing",null); else pushUniq(ctx.cfg.global,"ipv6 unicast-routing"); }}),
+      K("route","IPv6静的ルート",{c:[ P("staticV6Prefix","宛先プレフィックス X:X::X/長",{c:[
+        P("staticV6NH","ネクストホップ X:X::X",{act:function(ctx,v,neg,out,vals){ pushUniq(ctx.cfg.global,"ipv6 route "+canonIpv6(vals.staticV6Prefix)+" "+canonIpv6(vals.staticV6NH)); },c:[
+          P("staticV6AD","AD<1-255>(任意)",{act:function(ctx,v,neg,out,vals){ pushUniq(ctx.cfg.global,"ipv6 route "+canonIpv6(vals.staticV6Prefix)+" "+canonIpv6(vals.staticV6NH)+" "+vals.staticV6AD); }}) ]}),
+        K("Null0","破棄(ブラックホール)",{act:function(ctx,v,neg,out,vals){ pushUniq(ctx.cfg.global,"ipv6 route "+canonIpv6(vals.staticV6Prefix)+" Null0"); }})
+      ]}) ]})
+    ]}),
+    K("access-list","番号付きACL",{c:[ P("aclNum","<1-2699>",{c:[
+      K("permit","許可",{c:[ P("aceRest","条件",{act:function(ctx,v,neg,out,vals){ pushUniq(ctx.cfg.global,"access-list "+vals.aclNum+" permit "+vals.aceRest); }}) ]}),
+      K("deny","拒否",{c:[ P("aceRest","条件",{act:function(ctx,v,neg,out,vals){ pushUniq(ctx.cfg.global,"access-list "+vals.aclNum+" deny "+vals.aceRest); }}) ]})
+    ]}) ]}),
+    K("crypto","暗号鍵(SSH用)",{c:[ K("key","鍵",{c:[ K("generate","生成",{c:[ K("rsa","RSA鍵生成(動的アクション・config非反映/非採点)",{act:function(ctx){ /* 鍵生成は実機show runに残らない動的アクション＝config無反映・非採点(§0-2)。SSH成立はvty/transport ssh/login local/username/ip ssh versionのprereq集合で担保 */ }}) ]}) ]}) ]}),
+    K("username","ローカルユーザ",{c:[ P("userName","ユーザ名",{c:[
+      K("password","平文パスワード(priv既定)",{c:[ P("secretWord","パスワード",{act:function(ctx,v,neg,out,vals){ replacePrefix(ctx.cfg.global,"username "+vals.userName+" ","username "+vals.userName+" password "+v); }}) ]}),
+      K("secret","secret(priv既定)",{c:[ P("secretWord","パスワード",{act:function(ctx,v,neg,out,vals){ replacePrefix(ctx.cfg.global,"username "+vals.userName+" ","username "+vals.userName+" secret "+v); }}) ]}),
+      K("privilege","権限レベル",{c:[ P("privLevel","<0-15>",{c:[
+      K("password","平文パスワード",{c:[ P("secretWord","パスワード",{act:function(ctx,v,neg,out,vals){ replacePrefix(ctx.cfg.global,"username "+vals.userName+" ","username "+vals.userName+" privilege "+vals.privLevel+" password "+v); }}) ]}),
+      K("secret","secret(ハッシュ)",{c:[ P("secretWord","パスワード",{act:function(ctx,v,neg,out,vals){ replacePrefix(ctx.cfg.global,"username "+vals.userName+" ","username "+vals.userName+" privilege "+vals.privLevel+" secret "+v); }}) ]}),
+      K("algorithm-type","ハッシュ種別",{c:[
+        K("md5","MD5",{c:[ K("secret","secret",{c:[ P("secretWord","パスワード",{act:function(ctx,v,neg,out,vals){ replacePrefix(ctx.cfg.global,"username "+vals.userName+" ","username "+vals.userName+" privilege "+vals.privLevel+" algorithm-type md5 secret "+v); }}) ]}) ]}),
+        K("scrypt","Scrypt",{c:[ K("secret","secret",{c:[ P("secretWord","パスワード",{act:function(ctx,v,neg,out,vals){ replacePrefix(ctx.cfg.global,"username "+vals.userName+" ","username "+vals.userName+" privilege "+vals.privLevel+" algorithm-type scrypt secret "+v); }}) ]}) ]}),
+        K("sha256","SHA-256",{c:[ K("secret","secret",{c:[ P("secretWord","パスワード",{act:function(ctx,v,neg,out,vals){ replacePrefix(ctx.cfg.global,"username "+vals.userName+" ","username "+vals.userName+" privilege "+vals.privLevel+" algorithm-type sha256 secret "+v); }}) ]}) ]})
+      ]})
+    ]}) ]}) ]}) ]}),
+    K("line","回線設定",{c:[
+      K("vty","VTY回線",{c:[ P("lineNum","開始番号",{c:[ P("lineNum","終了番号",{act:function(ctx){ ctx.pushMode('line'); }}) ]}) ]}),
+      K("console","コンソール",{c:[ P("lineNum","番号",{act:function(ctx){ ctx.pushMode('line'); }}) ]})
+    ]}),
+    K("exit","設定モード終了",{act:function(ctx){ ctx.popMode(); }}),
+    K("end","特権EXECへ",{act:function(ctx){ ctx.endMode(); }})
+  ];
+
+  var aclCmds=[
+    K("permit","許可ACE",{c:[ P("aceRest","ACE条件",{act:function(ctx,v,neg,out,vals){ var ace=canonAce("permit "+vals.aceRest); if(!ctx.cfg.acls[ctx.ctxAcl]) ctx.cfg.acls[ctx.ctxAcl]=[]; if(ctx.cfg.acls[ctx.ctxAcl].indexOf(ace)<0) ctx.cfg.acls[ctx.ctxAcl].push(ace); }}) ]}),
+    K("deny","拒否ACE",{c:[ P("aceRest","ACE条件",{act:function(ctx,v,neg,out,vals){ var ace=canonAce("deny "+vals.aceRest); if(!ctx.cfg.acls[ctx.ctxAcl]) ctx.cfg.acls[ctx.ctxAcl]=[]; if(ctx.cfg.acls[ctx.ctxAcl].indexOf(ace)<0) ctx.cfg.acls[ctx.ctxAcl].push(ace); }}) ]}),
+    K("exit","ACL設定終了",{act:function(ctx){ ctx.popMode(); }}),
+    K("end","特権EXECへ",{act:function(ctx){ ctx.endMode(); }})
+  ];
+
+  var lineCmds=[
+    K("transport","トランスポート",{c:[ K("input","入力プロトコル",{c:[
+      K("telnet","Telnet",{act:function(ctx){ replacePrefix(ctx.cfg.linevty,"transport input ","transport input telnet"); }}),
+      K("ssh","SSH",{act:function(ctx){ replacePrefix(ctx.cfg.linevty,"transport input ","transport input ssh"); }}),
+      K("all","全て",{act:function(ctx){ replacePrefix(ctx.cfg.linevty,"transport input ","transport input all"); }}),
+      K("none","なし",{act:function(ctx){ replacePrefix(ctx.cfg.linevty,"transport input ","transport input none"); }})
+    ]}) ]}),
+    K("login","ログイン認証",{act:function(ctx){ replacePrefix(ctx.cfg.linevty,"login","login"); },c:[ K("local","ローカル認証",{act:function(ctx){ replacePrefix(ctx.cfg.linevty,"login","login local"); }}) ]}),
+    K("password","パスワード",{c:[ P("secretWord","パスワード",{act:function(ctx,v){ replacePrefix(ctx.cfg.linevty,"password ","password "+v); }}) ]}),
+    K("exit","上のモードへ",{act:function(ctx){ ctx.popMode(); }}),
+    K("end","特権EXECへ",{act:function(ctx){ ctx.endMode(); }})
+  ];
+
+  var dhcpCmds=[
+    K("network","配布ネットワーク",{c:[ P("ipv4","A.B.C.D",{c:[ P("ipv4mask","マスク",{act:function(ctx,v,neg,out,vals){ pushUniq(ctx.cfg.global,"network "+vals.ipv4+" "+vals.ipv4mask); }}) ]}) ]}),
+    K("default-router","デフォルトGW",{c:[ P("ipv4","A.B.C.D",{act:function(ctx,v){ pushUniq(ctx.cfg.global,"default-router "+v); }}) ]}),
+    K("dns-server","DNSサーバ",{c:[ P("ipv4","A.B.C.D",{act:function(ctx,v){ pushUniq(ctx.cfg.global,"dns-server "+v); }}) ]}),
+    K("exit","上のモードへ",{act:function(ctx){ ctx.popMode(); }}),
+    K("end","特権EXECへ",{act:function(ctx){ ctx.endMode(); }})
+  ];
+
+  var vlanCmds=[
+    K("name","VLAN名",{act:null,c:[ P("word","名前",{act:function(ctx,v){ replacePrefix(ctx.cfg.vlans[ctx.ctxVlan],"name ","name "+v); }}) ]}),
+    K("vlan","別VLAN作成",{c:[ P("vlanId","<1-4094>",{act:function(ctx,v){ if(!ctx.cfg.vlans[v]) ctx.cfg.vlans[v]=[]; ctx.ctxVlan=String(v); }}) ]}),
+    K("exit","設定モードへ",{act:function(ctx){ ctx.popMode(); }}),
+    K("end","特権EXECへ",{act:function(ctx){ ctx.endMode(); }})
+  ];
+
+  var ospfCmds=[
+    K("router-id","ルータID",{c:[ P("ipv4","A.B.C.D",{act:function(ctx,v){ replacePrefix(ctx.cfg.ospf.lines,"router-id ","router-id "+v); }}) ]}),
+    K("network","アドバタイズ",{c:[ P("ipv4","ネットワーク",{c:[ P("wildcard","ワイルドカード",{c:[ K("area","エリア",{c:[ P("area","<area>",{act:function(ctx,v,neg,out,vals){ pushUniq(ctx.cfg.ospf.lines,"network "+vals.ipv4+" "+vals.wildcard+" area "+canonArea(v)); }}) ]}) ]}) ]}) ]}),
+    K("exit","設定モードへ",{act:function(ctx){ ctx.popMode(); }}),
+    K("end","特権EXECへ",{act:function(ctx){ ctx.endMode(); }})
+  ];
+
+  var userCmds=[
+    K("enable","特権EXECへ",{act:function(ctx){ ctx.mode='priv'; }}),
+    K("exit","ログアウト",{act:function(ctx){}})
+  ];
+
+  return {
+    'user':userCmds,
+    'priv':privCmds.concat([ K("exit","ログアウト",{act:function(ctx){ ctx.mode='user'; }}) ]),
+    'global':globalCmds,
+    'interface':ifChildren,
+    'interface-range':ifChildren,
+    'vlan':vlanCmds,
+    'router-ospf':ospfCmds,
+    'ext-nacl':aclCmds,
+    'line':lineCmds,
+    'dhcp':dhcpCmds,
+    '_priv':privCmds
+  };
+}
+var GRAMMAR=buildGrammar();
+
+/* =====================================================================
+   4. パラメータ検証 / 評価器 (附属 §4)
+   ===================================================================== */
+function validParam(type,tok){
+  switch(type){
+    case 'vlanId': return /^\d+$/.test(tok)&&+tok>=1&&+tok<=4094 ? tok : null;
+    case 'vlanList': return /^[0-9,\-]+$/.test(tok) ? tok : null;
+    case 'word': return /^\S+$/.test(tok) ? tok : null;
+    case 'ifName': return canonIfName(tok) ? tok : null;
+    case 'ipv4': case 'ipv4mask': case 'wildcard':
+    case 'staticPrefix': case 'staticMask': case 'staticNH':
+      return /^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/.test(tok)&&tok.split('.').every(function(o){return +o<=255;}) ? tok : null;
+    case 'ipv6prefix': case 'staticV6Prefix': return (tok.indexOf(':')>=0&&tok.indexOf('/')>=0) ? tok : null;
+    case 'staticV6NH': return (tok.indexOf(':')>=0&&tok.indexOf('/')<0) ? tok : null;
+    case 'ospfPid': return /^\d+$/.test(tok)&&+tok>=1&&+tok<=65535 ? tok : null;
+    case 'area': return (/^\d+$/.test(tok)||/^\d+\.\d+\.\d+\.\d+$/.test(tok)) ? tok : null;
+    case 'priority': return /^\d+$/.test(tok)&&+tok>=0&&+tok<=255 ? tok : null;
+    case 'staticAD': case 'staticV6AD': return /^\d+$/.test(tok)&&+tok>=1&&+tok<=255 ? tok : null;
+    case 'channelNum': case 'poNum': return /^\d+$/.test(tok)&&+tok>=1&&+tok<=4096 ? tok : null;
+    case 'aclName': case 'userName': case 'secretWord': return /^\S+$/.test(tok) ? tok : null;
+    case 'aclNum': return /^\d+$/.test(tok)&&+tok>=1&&+tok<=2699 ? tok : null;
+    case 'privLevel': return /^\d+$/.test(tok)&&+tok>=0&&+tok<=15 ? tok : null;
+    case 'lineNum': return /^\d+$/.test(tok) ? tok : null;
+    case 'psMax': return /^\d+$/.test(tok)&&+tok>=1 ? tok : null;
+    case 'aceRest': return tok;
+    case 'ifRange': return tok;
+  }
+  return null;
+}
+var ERR_INVALID="% Invalid input detected at '^' marker.";
+var ERR_INCOMPLETE="% Incomplete command.";
+var ERR_AMBIG="% Ambiguous command:  ";
+var NO_REACH="この演習では使用できません。";
+
+function matchToken(cands,tok){
+  var kws=cands.filter(function(c){return c.t;});
+  var exact=kws.filter(function(c){return c.t===tok;});
+  if(exact.length===1) return {node:exact[0]};
+  var pref=kws.filter(function(c){return c.t.indexOf(tok)===0;});
+  if(pref.length===1) return {node:pref[0]};
+  if(pref.length>1) return {err:'ambig',list:pref};
+  var params=cands.filter(function(c){return c.p;});
+  for(var i=0;i<params.length;i++){ if(validParam(params[i].p,tok)!==null) return {node:params[i],param:true}; }
+  return {err:'invalid'};
+}
+function modeRoots(ctx){ return GRAMMAR[ctx.mode]||[]; }
+
+function evalLine(ctx,raw){
+  var out=[];
+  var line=raw.replace(/\t/g,' ').trim();
+  if(line==='') return {out:out};
+  if(ctx.confirm){ ctx.confirm=null; return {out:out}; }
+  if(line.charAt(line.length-1)==='?'){ return {out:helpFor(ctx,line.slice(0,-1).trim())}; }
+  var toks=line.split(/\s+/);
+  var neg=false;
+  if(toks[0]==='no'||toks[0]==='default'){ neg=true; toks.shift(); if(!toks.length) return {out:[ERR_INCOMPLETE]}; }
+  var roots;
+  if(toks[0]==='do'){ toks.shift(); roots=GRAMMAR._priv; }
+  else roots=modeRoots(ctx);
+  if(!neg && (toks[0]==='ping'||toks[0]==='traceroute')) return {out:[NO_REACH]};
+
+  var cands=roots, node=null, vals={};
+  for(var i=0;i<toks.length;i++){
+    var tk=toks[i];
+    var r=matchToken(cands,tk);
+    if(r.err==='ambig') return {out:[ERR_AMBIG+r.list.map(function(c){return c.t;}).join('  ')]};
+    if(r.err==='invalid'){
+      return {out:[ERR_INVALID]};
+    }
+    node=r.node;
+    if(node.p){
+      if(node.p==='ifRange'){
+        var rangeStr=toks.slice(i).join(' ');
+        var expanded=expandRange(rangeStr);
+        if(!expanded) return {out:[ERR_INVALID]};
+        vals.__range=expanded; vals.ifRange=rangeStr;
+        i=toks.length;
+      }else if(node.p==='aceRest'){
+        vals.aceRest=toks.slice(i).join(' ');
+        i=toks.length;
+      }else{
+        var pv=validParam(node.p,tk);
+        if(pv===null) return {out:[ERR_INVALID]};
+        vals[node.p]=pv;
+      }
+    }
+    cands=node.children;
+  }
+  if(!node) return {out:[ERR_INVALID]};
+  if(!node.act){ return {out:[ERR_INCOMPLETE]}; }
+  if(neg && !node.neg){ return {out:[ERR_INVALID]}; }
+  var lastVal = node.p? (vals[node.p]!==undefined?vals[node.p]:vals.ifRange) : null;
+  node.act(ctx,lastVal,neg,out,vals);
+  return {out:out};
+}
+
+function expandRange(s){
+  var m=s.match(/^(\S+)\s*-\s*(\S+)$/); if(!m) return null;
+  var startNm=canonIfName(m[1]); if(!startNm) return null;
+  var endRaw=m[2], endNm=canonIfName(endRaw);
+  var sm=startNm.match(/^(.*?)(\d+)$/); if(!sm) return null;
+  var prefix=sm[1], sLast=parseInt(sm[2],10);
+  var eLast;
+  if(endNm){ var em=endNm.match(/^(.*?)(\d+)$/); if(!em||em[1]!==prefix) return null; eLast=parseInt(em[2],10); }
+  else if(/^\d+$/.test(endRaw)){ eLast=parseInt(endRaw,10); }
+  else return null;
+  if(eLast<sLast) return null;
+  var list=[];
+  for(var n=sLast;n<=eLast;n++) list.push(prefix+n);
+  return list;
+}
+function helpFor(ctx,partial){
+  var cands;
+  var toks=partial===''?[]:partial.split(/\s+/);
+  if(toks[0]==='do'){ cands=GRAMMAR._priv; toks.shift(); }
+  else { if(toks[0]==='no'||toks[0]==='default') toks=toks.slice(1); cands=modeRoots(ctx); }
+  for(var i=0;i<toks.length;i++){ var r=matchToken(cands,toks[i]); if(r.err||!r.node) break; cands=r.node.children; }
+  var lines=cands.map(function(c){ var name=c.t?c.t:('<'+c.p+'>'); return "  "+pad(name,28)+(c.help||""); });
+  if(!lines.length) lines=["  <cr>"];
+  return lines;
+}
+function pad(s,n){ s=String(s); while(s.length<n) s+=' '; return s; }
+function tabComplete(ctx,line){
+  var toks=line.split(/\s+/);
+  var prefix="", cands=modeRoots(ctx);
+  if(toks[0]==='do'){ prefix="do "; cands=GRAMMAR._priv; toks=toks.slice(1); }
+  else if(toks[0]==='no'||toks[0]==='default'){ prefix=toks[0]+" "; toks=toks.slice(1); }
+  if(!toks.length) return line;
+  var last=toks[toks.length-1];
+  for(var i=0;i<toks.length-1;i++){ var r=matchToken(cands,toks[i]); if(r.err||!r.node) return line; cands=r.node.children; }
+  var kws=cands.filter(function(c){return c.t&&c.t.indexOf(last)===0;});
+  if(kws.length===1){ toks[toks.length-1]=kws[0].t; return prefix+toks.join(' ')+' '; }
+  return line;
+}
+
+/* =====================================================================
+   4b. 検証コマンド(show系) 出力ヘルパ ＝ 自機 running-config から導出(表示のみ・cfg/startup不変)
+   ===================================================================== */
+function shortIf(nm){ return String(nm).replace('FastEthernet','Fa').replace('GigabitEthernet','Gi').replace('TenGigabitEthernet','Te').replace('Loopback','Lo').replace('Ethernet','Et'); }
+function ifAccessVlan(f){ for(var i=0;i<f.lines.length;i++){ var m=f.lines[i].match(/^switchport access vlan (\d+)/); if(m) return m[1]; } return null; }
+function ifIsTrunk(f){ return f.lines.indexOf("switchport mode trunk")>=0; }
+function ifIp(f){ for(var i=0;i<f.lines.length;i++){ var m=f.lines[i].match(/^ip address (\S+)\s/); if(m) return m[1]; } return null; }
+function ifPriority(f){ for(var i=0;i<f.lines.length;i++){ var m=f.lines[i].match(/^ip ospf priority (\d+)/); if(m) return m[1]; } return null; }
+function showVlanBrief(ctx,out){
+  out.push("VLAN Name                             Status    Ports");
+  out.push("---- -------------------------------- --------- -------------------------------");
+  var assigned={};
+  Object.keys(ctx.cfg.ifs).forEach(function(nm){ var v=ifAccessVlan(ctx.cfg.ifs[nm]); if(v){ (assigned[v]=assigned[v]||[]).push(shortIf(nm)); } });
+  var ids=Object.keys(ctx.cfg.vlans).map(Number); if(ids.indexOf(1)<0) ids.push(1);
+  ids.sort(function(a,b){ return a-b; });
+  ids.forEach(function(id){
+    var name;
+    if(id===1){ name="default"; }
+    else { name=null; (ctx.cfg.vlans[String(id)]||[]).forEach(function(l){ var m=l.match(/^name (\S+)/); if(m) name=m[1]; }); if(!name) name="VLAN"+("0000"+id).slice(-4); }
+    out.push(pad(String(id),5)+pad(name,33)+pad("active",10)+(assigned[String(id)]||[]).join(", "));
+  });
+}
+function showIpIntBrief(ctx,out){
+  out.push("Interface                  IP-Address      OK? Method Status                Protocol");
+  var names={};
+  (ctx.interfaces||[]).forEach(function(n){ names[canonIfName(n)||n]=1; });
+  Object.keys(ctx.cfg.ifs).forEach(function(n){ names[n]=1; });
+  var list=Object.keys(names).sort();
+  if(!list.length){ out.push("(設定済みインターフェースなし)"); return; }
+  list.forEach(function(nm){
+    var f=ctx.cfg.ifs[nm]; var ip=f?ifIp(f):null; var down=f?f.shutdown:false;
+    var status=down?"administratively down":"up"; var proto=down?"down":"up";
+    out.push(pad(nm,27)+pad(ip||"unassigned",16)+"YES manual "+pad(status,22)+proto);
+  });
+}
+function showIntfStatus(ctx,out){
+  out.push("Port      Name               Status       Vlan       Duplex  Speed Type");
+  var names=Object.keys(ctx.cfg.ifs).sort();
+  if(!names.length){ out.push("(設定済みポートなし)"); return; }
+  names.forEach(function(nm){
+    var f=ctx.cfg.ifs[nm];
+    var vlan=ifIsTrunk(f)?"trunk":(ifAccessVlan(f)||"1");
+    var st=f.shutdown?"disabled":"connected";
+    out.push(pad(shortIf(nm),10)+pad("",19)+pad(st,13)+pad(vlan,11)+"auto   auto  10/100/1000BaseTX");
+  });
+}
+function topoLinksFor(ctx){
+  var spec=TOPO[ctx.simId]; var res=[]; if(!spec) return res;
+  spec.links.forEach(function(l){
+    if(!l.aIf||!l.bIf) return;
+    if(l.a===ctx.name) res.push({local:l.aIf,remote:l.b,remoteIf:l.bIf});
+    else if(l.b===ctx.name) res.push({local:l.bIf,remote:l.a,remoteIf:l.aIf});
+  });
+  return res;
+}
+function peerCfg(ctx,name){ try{ var P=emus[ctx.simId]; return (P&&P[name])?P[name].cfg:null; }catch(e){ return null; } }
+function cdpActive(cfg,ifn){ if(!cfg) return true; if(cfg.global.indexOf("no cdp run")>=0) return false; var f=cfg.ifs[canonIfName(ifn)||ifn]; if(f&&f.lines.indexOf("no cdp enable")>=0) return false; return true; }
+function lldpActive(cfg,ifn){ if(!cfg) return true; if(cfg.global.indexOf("lldp run")<0) return false; var f=cfg.ifs[canonIfName(ifn)||ifn]; if(f&&(f.lines.indexOf("no lldp transmit")>=0||f.lines.indexOf("no lldp receive")>=0)) return false; return true; }
+function showCdpNei(ctx,out){
+  out.push("Capability Codes: R - Router, T - Trans Bridge, B - Source Route Bridge");
+  out.push("                  S - Switch, H - Host, I - IGMP, r - Repeater, P - Phone");
+  out.push("");
+  out.push("Device ID        Local Intrfce     Holdtme   Capability  Platform   Port ID");
+  topoLinksFor(ctx).forEach(function(L){
+    if(cdpActive(ctx.cfg,L.local) && cdpActive(peerCfg(ctx,L.remote),L.remoteIf)){
+      out.push(pad(L.remote,17)+pad(shortIf(L.local),18)+pad("145",10)+pad("R S I",12)+pad("cisco",11)+shortIf(L.remoteIf));
+    }
+  });
+}
+function showLldpNei(ctx,out){
+  out.push("Capability codes:");
+  out.push("    (R) Router, (B) Bridge, (T) Telephone, (W) WLAN Access Point, (S) Station");
+  out.push("");
+  out.push("Device ID           Local Intf    Hold-time  Capability   Port ID");
+  topoLinksFor(ctx).forEach(function(L){
+    if(lldpActive(ctx.cfg,L.local) && lldpActive(peerCfg(ctx,L.remote),L.remoteIf)){
+      out.push(pad(L.remote,20)+pad(shortIf(L.local),14)+pad("120",11)+pad("R",13)+shortIf(L.remoteIf));
+    }
+  });
+}
+function showOspfNei(ctx,out){
+  if(!ctx.cfg.ospf) return;
+  out.push("Neighbor ID     Pri   State           Dead Time   Address         Interface");
+  topoLinksFor(ctx).forEach(function(L){
+    var rc=peerCfg(ctx,L.remote); if(!rc||!rc.ospf) return;
+    var rif=rc.ifs[canonIfName(L.remoteIf)||L.remoteIf];
+    var rip=rif?ifIp(rif):null; var pri=(rif?ifPriority(rif):null)||"1";
+    out.push(pad(rip||L.remote,16)+pad(pri,6)+pad("FULL/DROTHER",16)+pad("00:00:35",12)+pad(rip||"-",16)+(canonIfName(L.local)||L.local));
+  });
+}
+
+/* =====================================================================
+   5. エミュレータ コンテキスト
+   ===================================================================== */
+function createEmu(devSpec){
+  var ctx={
+    name:devSpec.name, type:devSpec.type, role:devSpec.role, interfaces:devSpec.interfaces||[],
+    cfg:parseConfig(devSpec.baselineRunning),
+    startup:parseConfig(devSpec.baselineStartup),
+    mode:'user', stack:[], ctxIf:null, ctxRange:null, ctxVlan:null, ctxAcl:null, confirm:null,
+    history:[], outBuf:[]
+  };
+  ctx.pushMode=function(m){ ctx.stack.push({mode:ctx.mode,ctxIf:ctx.ctxIf,ctxRange:ctx.ctxRange,ctxVlan:ctx.ctxVlan,ctxAcl:ctx.ctxAcl}); ctx.mode=m; };
+  ctx.popMode=function(){ if(ctx.stack.length){ var s=ctx.stack.pop(); ctx.mode=s.mode; ctx.ctxIf=s.ctxIf; ctx.ctxRange=s.ctxRange; ctx.ctxVlan=s.ctxVlan; ctx.ctxAcl=s.ctxAcl; } else { ctx.mode='priv'; } };
+  ctx.endMode=function(){ ctx.stack=[]; ctx.mode='priv'; ctx.ctxIf=null; ctx.ctxRange=null; ctx.ctxVlan=null; ctx.ctxAcl=null; };
+  return ctx;
+}
+function promptFor(ctx){
+  var h=ctx.cfg.hostname||ctx.name;
+  switch(ctx.mode){
+    case 'user': return h+">";
+    case 'priv': return h+"#";
+    case 'global': return h+"(config)#";
+    case 'interface': return h+"(config-if)#";
+    case 'interface-range': return h+"(config-if-range)#";
+    case 'vlan': return h+"(config-vlan)#";
+    case 'router-ospf': return h+"(config-router)#";
+    case 'ext-nacl': return h+"(config-ext-nacl)#";
+    case 'line': return h+"(config-line)#";
+    case 'dhcp': return h+"(dhcp-config)#";
+  }
+  return h+"#";
+}
+
+/* =====================================================================
+   6. 採点
+   ===================================================================== */
+async function sha256Hex(str){
+  var buf=await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+  return Array.prototype.map.call(new Uint8Array(buf),function(b){return ('0'+b.toString(16)).slice(-2);}).join('');
+}
+async function selectHash(qid, idxArr){
+  var labels=idxArr.map(function(i){return String.fromCharCode(65+i);}).sort();
+  return await sha256Hex(qid+":"+labels.join(','));
+}
+function sectionSet(cfg, el){
+  if(el.section==='global') return {lines:cfg.global.slice(), shutdown:false};
+  if(el.section==='vlan'){ var all=[]; Object.keys(cfg.vlans).forEach(function(id){ all=all.concat(cfg.vlans[id]); }); return {lines:all, shutdown:false}; }
+  if(el.section==='router-ospf'){ if(!cfg.ospf) return {lines:[], shutdown:false}; return {lines:["router ospf "+cfg.ospf.pid].concat(cfg.ospf.lines), shutdown:false}; }
+  if(el.section==='interface'){ var f=cfg.ifs[el.interface]; if(!f) return {lines:[], shutdown:false, missing:true}; return {lines:f.lines.slice(), shutdown:f.shutdown}; }
+  if(el.section==='line-vty'){ return {lines:(cfg.linevty||[]).slice(), shutdown:false}; }
+  if(el.section==='acl'){ return {lines:((cfg.acls&&cfg.acls[el.aclName])||[]).slice(), shutdown:false}; }
+  return {lines:[], shutdown:false};
+}
+function elementSatisfied(cfg, el){
+  var sec=sectionSet(cfg, el);
+  var has=function(line){ return sec.lines.indexOf(squashWs(line))>=0; };
+  var ok=true;
+  if(el.expect && el.expect.length){
+    ok = el.expect.every(function(e){ return has(e); });
+    if(!ok && el.accept && el.accept.length){ ok = el.accept.every(function(a){ return has(a); }); }
+  }
+  if(ok && el.expectAbsent && el.expectAbsent.length){
+    el.expectAbsent.forEach(function(a){
+      if(a==='shutdown'){ if(sec.shutdown) ok=false; }
+      else if(has(a)) ok=false;
+    });
+  }
+  return ok;
+}
+function scoreSim(sim, devStartups){
+  /* §3c ACL: section==='acl' の要素は (device,aclName) 単位でまとめ、
+     rubric記載順の期待ACE列が config のACE列に「順序付き部分列」として並ぶ要素のみ got=true。
+     順序逆転・欠落したACEは加点されない（部分点を維持・採点ロジックの新規拡張はここのみ）。 */
+  var aclSat={};
+  var groups={};
+  sim.rubric.elements.forEach(function(el){
+    if(el.section==='acl'){ var key=el.device+" "+el.aclName; (groups[key]=groups[key]||[]).push(el); }
+  });
+  Object.keys(groups).forEach(function(key){
+    var p=key.split(" "), dev=p[0], aclName=p[1];
+    var cfg=devStartups[dev];
+    var configACEs=(cfg&&cfg.acls&&cfg.acls[aclName])?cfg.acls[aclName]:[];
+    var satset={}, j=0;
+    groups[key].forEach(function(el){
+      var ace=(el.expect&&el.expect.length)?squashWs(el.expect[0]):null;
+      if(ace===null) return;
+      var found=-1;
+      for(var k=j;k<configACEs.length;k++){ if(configACEs[k]===ace){ found=k; break; } }
+      if(found>=0){ satset[el.id]=true; j=found+1; }
+    });
+    aclSat[key]=satset;
+  });
+  var elements=sim.rubric.elements.map(function(el){
+    var cfg=devStartups[el.device];
+    var got;
+    if(el.section==='acl'){ var key=el.device+" "+el.aclName; got=!!(aclSat[key]&&aclSat[key][el.id]); }
+    else got = cfg? elementSatisfied(cfg, el) : false;
+    return {id:el.id, desc:el.desc, weight:el.weight, device:el.device, got:got, el:el};
+  });
+  var earned=elements.reduce(function(s,e){return s+(e.got?e.weight:0);},0);
+  return {simId:sim.simId, points:sim.points, earned:earned, elements:elements};
+}
+
+/* =====================================================================
+   7. トポロジ図 (presentation・logicalから作図・C-6原典は別途PNG)
+   ===================================================================== */
+var TOPO={
+
+ "BANK-S13": {"w": 680, "h": 400, "nodes": [{"id": "R1", "label": "R1 (環境)", "type": "router", "x": 340, "y": 80}, {"id": "SW-1", "label": "SW-1", "type": "switch", "x": 190, "y": 210}, {"id": "SW-2", "label": "SW-2", "type": "switch", "x": 490, "y": 210}, {"id": "PC1", "label": "PC1", "type": "pc", "x": 130, "y": 340}, {"id": "PC2", "label": "PC2", "type": "pc", "x": 540, "y": 340}], "links": [{"a": "R1", "b": "SW-1", "aIf": "Fa0/0", "bIf": "Fa0/1", "kind": "trunk"}, {"a": "R1", "b": "SW-2", "aIf": "Fa0/1", "bIf": "Fa0/1", "kind": "trunk"}, {"a": "SW-1", "b": "SW-2", "aIf": "Fa0/2", "bIf": "Fa0/2", "kind": "access"}, {"a": "SW-1", "b": "PC1", "aIf": "Fa0/3", "kind": "access"}, {"a": "SW-2", "b": "PC2", "aIf": "Fa0/3", "kind": "access"}], "note": "R1はサブIF＋lldp runの環境機器。LLDPは既定OFF＝両スイッチでlldp run、PC1ポートは無効"},
+ "BANK-S14": {"w": 720, "h": 420, "nodes": [{"id": "R1", "label": "R1", "type": "router", "x": 180, "y": 150}, {"id": "R2", "label": "R2 (環境)", "type": "router", "x": 440, "y": 150}, {"id": "R3", "label": "R3 (環境)", "type": "router", "x": 180, "y": 300}, {"id": "R4", "label": "R4 (環境)", "type": "router", "x": 440, "y": 300}, {"id": "Server1", "label": "Server1", "type": "pc", "x": 620, "y": 300}], "links": [{"a": "R1", "b": "R2", "aIf": "Gi0/0", "bIf": "Gi0/0", "kind": "routed"}, {"a": "R1", "b": "R3", "aIf": "Gi0/1", "bIf": "Gi0/0", "kind": "routed"}, {"a": "R2", "b": "R4", "aIf": "Gi0/1", "bIf": "Gi0/0", "kind": "routed"}, {"a": "R3", "b": "R4", "aIf": "Gi0/1", "bIf": "Gi0/1", "kind": "routed"}, {"a": "R4", "b": "Server1", "aIf": "Gi0/2", "kind": "access"}], "note": "IPv6のみ。R2/R3/R4は下地ルート保持の環境機器。タスクはR1(主経路R2優先＋フローティングR3経由AD2)"},
+ "BANK-S16": {"w": 760, "h": 440, "nodes": [{"id": "R1", "label": "R1 (DHCP/OSPF)", "type": "router", "x": 330, "y": 70}, {"id": "Sw103", "label": "Sw103", "type": "switch", "x": 170, "y": 200}, {"id": "Sw104", "label": "Sw104", "type": "switch", "x": 500, "y": 200}, {"id": "Sw101", "label": "Sw101", "type": "switch", "x": 170, "y": 340}, {"id": "Sw102", "label": "Sw102", "type": "switch", "x": 500, "y": 340}, {"id": "PC1", "label": "PC1(V101)", "type": "pc", "x": 90, "y": 420}, {"id": "PC2", "label": "PC2", "type": "pc", "x": 580, "y": 420}], "links": [{"a": "R1", "b": "Sw103", "aIf": "Gi0/0", "bIf": "Fa0/2", "kind": "routed"}, {"a": "R1", "b": "Sw104", "aIf": "Gi0/3", "bIf": "Fa0/4", "kind": "routed"}, {"a": "Sw103", "b": "Sw104", "aIf": "Fa0/1", "bIf": "Fa0/1", "kind": "routed"}, {"a": "Sw103", "b": "Sw101", "aIf": "Fa0/3", "bIf": "Fa0/3", "kind": "routed"}, {"a": "Sw104", "b": "Sw102", "aIf": "Fa0/3", "bIf": "Fa0/3", "kind": "routed"}, {"a": "Sw101", "b": "Sw102", "aIf": "Fa0/2", "bIf": "Fa0/2", "kind": "routed"}, {"a": "Sw101", "b": "PC1", "aIf": "Fa0/1", "kind": "access"}, {"a": "Sw102", "b": "PC2", "aIf": "Fa0/1", "kind": "access"}], "note": "INTERNET_ACLは下地3行(ospf/bootps/domain)へ末尾追記し R1 Gi0/0・Gi0/3 in。Sw101スヌーピングはリレー経由でtrust不要。Sw102/104は中継"},
+ "BANK-S38": {"w": 720, "h": 440, "nodes": [{"id": "ISP", "label": "ISP (環境)", "type": "router", "x": 560, "y": 90}, {"id": "R1", "label": "R1 (NAT/NTP/DHCP)", "type": "router", "x": 300, "y": 90}, {"id": "Sw1", "label": "Sw1 (L3:NTP/Relay/SSH)", "type": "switch", "x": 300, "y": 250}, {"id": "PC1", "label": "PC1 (Sales/DHCP)", "type": "pc", "x": 160, "y": 390}, {"id": "PC2", "label": "PC2 (Marketing/DHCP)", "type": "pc", "x": 440, "y": 390}], "links": [{"a": "R1", "b": "ISP", "aIf": "Gi0/0", "bIf": "Gi0/0", "kind": "routed"}, {"a": "R1", "b": "Sw1", "aIf": "Gi0/1", "bIf": "Fa0/1", "kind": "routed"}, {"a": "Sw1", "b": "PC1", "aIf": "Fa0/2", "kind": "access"}, {"a": "Sw1", "b": "PC2", "aIf": "Fa0/3", "kind": "access"}], "note": "R1=NAT/PAT(in/out/ACL下地)兼NTPサーバ兼DHCPサーバ(下地)。Sw1=L3でNTPクライアント・Fa0/2リレー・SSHv2。Sw1 Fa0/1-3はno switchport。ISP=環境・PCはDHCPクライアント"},
+ 'S-07':{w:660,h:400,nodes:[
+   {id:'Sw1',label:'Sw1',type:'switch',x:130,y:150},
+   {id:'Sw2',label:'Sw2',type:'switch',x:340,y:90},
+   {id:'Sw3',label:'Sw3',type:'switch',x:540,y:150},
+   {id:'PC5',label:'PC5',type:'pc',x:130,y:310},
+   {id:'PC3',label:'PC3',type:'pc',x:340,y:250},
+   {id:'PC4',label:'PC4',type:'pc',x:470,y:320},
+   {id:'PC6',label:'PC6',type:'pc',x:600,y:320}
+ ],links:[
+   {a:'Sw1',b:'Sw2',aIf:'Fa0/3',bIf:'Fa0/3',label:'トランク',kind:'trunk'},
+   {a:'Sw2',b:'Sw3',aIf:'Fa0/4',bIf:'Fa0/4',label:'トランク',kind:'trunk'},
+   {a:'Sw1',b:'PC5',aIf:'Fa0/2',label:'VLAN210',kind:'access'},
+   {a:'Sw2',b:'PC3',aIf:'Fa0/2',label:'VLAN110',kind:'access'},
+   {a:'Sw3',b:'PC4',aIf:'Fa0/1',label:'VLAN110',kind:'access'},
+   {a:'Sw3',b:'PC6',aIf:'Fa0/2',label:'VLAN210',kind:'access'}
+ ],note:'VLAN110=MARKETING / VLAN210=FINANCE'},
+
+ 'S-24':{w:660,h:400,nodes:[
+   {id:'R1',label:'R1 (環境)',type:'router',x:120,y:80},
+   {id:'R2',label:'R2 (環境)',type:'router',x:540,y:80},
+   {id:'SW-1',label:'SW-1',type:'switch',x:190,y:210},
+   {id:'SW-2',label:'SW-2',type:'switch',x:470,y:210},
+   {id:'PC1',label:'PC1',type:'pc',x:120,y:330},
+   {id:'PC2',label:'PC2',type:'pc',x:540,y:330}
+ ],links:[
+   {a:'R1',b:'SW-1',aIf:'Fa0/0',bIf:'Fa0/3',label:'LLDPのみ',kind:'lldp'},
+   {a:'R2',b:'SW-2',aIf:'Fa0/0',bIf:'Fa0/3',label:'LLDPのみ',kind:'lldp'},
+   {a:'SW-1',b:'SW-2',aIf:'Fa0/1',bIf:'Fa0/1',label:'CDPのみ',kind:'cdp'},
+   {a:'SW-1',b:'PC1',aIf:'Fa0/2',label:'VLAN15',kind:'access'},
+   {a:'SW-2',b:'PC2',aIf:'Fa0/2',label:'VLAN66',kind:'access'}
+ ],note:'VLAN15=OPS / VLAN66=ENGINEERING。R1/R2は lldp run・IP既設の環境機器'},
+
+ 'S-36':{w:660,h:400,nodes:[
+   {id:'HQ1',label:'HQ1',type:'router',x:330,y:90},
+   {id:'HQ2',label:'HQ2 (環境)',type:'router',x:150,y:300},
+   {id:'HQ3',label:'HQ3 (環境)',type:'router',x:510,y:300}
+ ],links:[
+   {a:'HQ1',b:'HQ2',aIf:'Gi0/0',bIf:'Gi0/0',label:'10.0.112.0/30',kind:'routed'},
+   {a:'HQ1',b:'HQ3',aIf:'Gi0/1',bIf:'Gi0/0',label:'10.0.113.0/29',kind:'routed'},
+   {a:'HQ2',b:'HQ3',aIf:'Gi0/1',bIf:'Gi0/1',label:'10.0.213.0/28',kind:'routed'}
+ ],note:'全リンク Area 0。HQ1 Lo0=10.110.110.110/32 (router-id)。HQ2/HQ3はOSPF既設(priority既定1)'},
+
+ 'S-21':{w:660,h:300,nodes:[
+   {id:'R1',label:'R1',type:'router',x:200,y:150},
+   {id:'R2',label:'R2',type:'router',x:460,y:150}
+ ],links:[
+   {a:'R1',b:'R2',aIf:'Gi0/1',bIf:'Gi0/1',label:'192.168.180.16/28 ・ 2001:db8:acca::/64',kind:'routed'}
+ ],note:'R1=最初の使用可能ホスト(.17 / ::1) / R2=最後(.30 / ::2)。デュアルスタック'}
+};
+var LINK_COLOR={trunk:'#e8552b',access:'#888',lldp:'#2b8ae8',cdp:'#7a4fd0',routed:'#2e9e63'};
+function _arrow(x1,y1,x2,y2,col){
+  var ang=Math.atan2(y2-y1,x2-x1), hl=4.0, sp=0.55;
+  var ax=x2+hl*Math.cos(ang+Math.PI-sp), ay=y2+hl*Math.sin(ang+Math.PI-sp);
+  var bx=x2+hl*Math.cos(ang+Math.PI+sp), by=y2+hl*Math.sin(ang+Math.PI+sp);
+  return '<line x1="'+x1+'" y1="'+y1+'" x2="'+x2+'" y2="'+y2+'" stroke="'+col+'" stroke-width="1.5" stroke-linecap="round"/>'+
+         '<path d="M'+x2+' '+y2+' L'+ax+' '+ay+' L'+bx+' '+by+' Z" fill="'+col+'"/>';
+}
+function nodeBox(n){ return n.type==='switch'?{rw:42,rh:15}:(n.type==='router'?{rw:38,rh:20}:{rw:30,rh:18}); }
+function boxEdge(n,ux,uy){
+  var b=nodeBox(n);
+  var tx=ux!==0?Math.abs(b.rw/ux):1e9, ty=uy!==0?Math.abs(b.rh/uy):1e9;
+  var t=Math.min(tx,ty);
+  return {x:n.x+ux*t, y:n.y+uy*t};
+}
+function icRouter(cx,cy,name){
+  var edge='#1e4e79', w=38, h=20;
+  var s='<g filter="url(#ds)">';
+  s+='<rect x="'+(cx-w)+'" y="'+(cy-h)+'" width="'+(2*w)+'" height="'+(2*h)+'" rx="'+h+'" fill="url(#gRtr)" stroke="'+edge+'" stroke-width="1.8"/>';
+  s+='</g>';
+  var ay=cy-11;
+  s+=_arrow(cx-14,ay,cx-5,ay,edge)+_arrow(cx+14,ay,cx+5,ay,edge);
+  s+='<text x="'+cx+'" y="'+(cy+9)+'" text-anchor="middle" font-size="15" font-weight="700" fill="#10243a">'+esc(name)+'</text>';
+  return s;
+}
+function icSwitch(cx,cy,name){
+  var edge='#2f855a', w=42, fh=30, x=cx-w, y=cy-fh/2, dpx=11, dpy=9;
+  var s='<g filter="url(#ds)">';
+  s+='<path d="M'+x+' '+y+' l'+dpx+' -'+dpy+' h'+(2*w)+' l-'+dpx+' '+dpy+' Z" fill="#dcf4e8" stroke="'+edge+'" stroke-width="1.4"/>';
+  s+='<path d="M'+(x+2*w)+' '+y+' l'+dpx+' -'+dpy+' v'+fh+' l-'+dpx+' '+dpy+' Z" fill="#a9dcc1" stroke="'+edge+'" stroke-width="1.4"/>';
+  s+='<rect x="'+x+'" y="'+y+'" width="'+(2*w)+'" height="'+fh+'" rx="3" fill="url(#gSw)" stroke="'+edge+'" stroke-width="1.8"/>';
+  s+='</g>';
+  var ay=cy-8;
+  s+=_arrow(cx-14,ay,cx-5,ay,edge)+_arrow(cx+14,ay,cx+5,ay,edge);
+  s+='<text x="'+cx+'" y="'+(cy+9)+'" text-anchor="middle" font-size="15" font-weight="700" fill="#143a28">'+esc(name)+'</text>';
+  return s;
+}
+function icPC(cx,cy,name){
+  var w=30, h=18;
+  var s='<g filter="url(#ds)">';
+  s+='<rect x="'+(cx-w)+'" y="'+(cy-h)+'" width="'+(2*w)+'" height="'+(2*h)+'" rx="4" fill="#cfd8e2" stroke="#4a5560" stroke-width="1.6"/>';
+  s+='<rect x="'+(cx-w+4)+'" y="'+(cy-h+3)+'" width="'+(2*w-8)+'" height="'+(2*h-6)+'" rx="2" fill="#eef5fc" stroke="#9bb6d2"/>';
+  s+='<text x="'+cx+'" y="'+(cy+5)+'" text-anchor="middle" font-size="14" font-weight="700" fill="#1f3a56">'+esc(name)+'</text>';
+  s+='<rect x="'+(cx-4)+'" y="'+(cy+h)+'" width="8" height="6" fill="#9aa6b2"/>';
+  s+='<rect x="'+(cx-12)+'" y="'+(cy+h+5)+'" width="24" height="4.5" rx="2" fill="#6b7785"/>';
+  s+='</g>';
+  return s;
+}
+function devSVG(n){
+  if(n.type==='router') return icRouter(n.x,n.y,n.id);
+  if(n.type==='switch') return icSwitch(n.x,n.y,n.id);
+  return icPC(n.x,n.y,n.id);
+}
+function topoDefs(){
+  return '<defs>'+
+   '<linearGradient id="gRtr" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#eaf3fb"/><stop offset="1" stop-color="#b9d4ee"/></linearGradient>'+
+   '<linearGradient id="gSw" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e9f9f1"/><stop offset="1" stop-color="#bfe6cf"/></linearGradient>'+
+   '<linearGradient id="gbg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#eef2f7"/></linearGradient>'+
+   '<filter id="ds" x="-30%" y="-30%" width="160%" height="175%"><feDropShadow dx="0" dy="1.4" stdDeviation="1.5" flood-color="#1b2733" flood-opacity="0.25"/></filter>'+
+   '</defs>';
+}
+function topoSVG(simId){
+  var spec=TOPO[simId];
+  if(!spec) return "<div class='small' style='padding:12px'>(トポロジ未定義)</div>";
+  var nById={}; spec.nodes.forEach(function(n){ nById[n.id]=n; });
+  var s='<svg viewBox="0 0 '+spec.w+' '+spec.h+'" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI,Meiryo,sans-serif">';
+  s+=topoDefs();
+  s+='<rect x="0" y="0" width="'+spec.w+'" height="'+spec.h+'" fill="url(#gbg)"/>';
+  var chips='';
+  spec.links.forEach(function(l){
+    var A=nById[l.a],B=nById[l.b]; if(!A||!B) return;
+    var dx=B.x-A.x, dy=B.y-A.y, len=Math.sqrt(dx*dx+dy*dy)||1, ux=dx/len, uy=dy/len;
+    var ea=boxEdge(A,ux,uy), eb=boxEdge(B,-ux,-uy);
+    s+='<line x1="'+ea.x+'" y1="'+ea.y+'" x2="'+eb.x+'" y2="'+eb.y+'" stroke="#7b8794" stroke-width="2.4" stroke-linecap="round"/>';
+    var pxu=-uy, pyu=ux, off=11, dP=20;
+    if(l.aIf) chips+=ifLabel(ea.x+ux*dP+pxu*off, ea.y+uy*dP+pyu*off, l.aIf);
+    if(l.bIf) chips+=ifLabel(eb.x-ux*dP+pxu*off, eb.y-uy*dP+pyu*off, l.bIf);
+  });
+  spec.nodes.forEach(function(n){ s+=devSVG(n); });
+  s+=chips;
+  s+='</svg>';
+  return s;
+}
+function ifLabel(x,y,t){
+  var w=6.6*t.length+8;
+  return '<rect x="'+(x-w/2)+'" y="'+(y-8)+'" width="'+w+'" height="15" rx="3" fill="#fff7e0" stroke="#d9b25a" stroke-width="1"/>'+
+         '<text x="'+x+'" y="'+(y+2.6)+'" text-anchor="middle" font-size="10" font-weight="600" fill="#7a5a10" font-family="Consolas,monospace">'+esc(t)+'</text>';
+}
+
+/* =====================================================================
+   8. アプリ本体 (状態 / 一方向フロー / 永続化)
+   ===================================================================== */
+var SELECT = loadJSON('select-data', []);
+var SIMDATA = loadJSON('sim-data', {sims:[]});
+var CONFIG = loadJSON('app-config', {timeLimitSec:6000,passRate:0.9,autosaveSec:5,gasEndpoint:"",token:"",domainConfig:{}});
+var SIMS = SIMDATA.sims||[];
+var DOMAIN_LABEL={NF:"ネットワーク基礎",NA:"ネットワークアクセス",IPConn:"IP接続",IPSvc:"IPサービス",Sec:"セキュリティ基礎",Auto:"自動化/プログラマビリティ"};
+
+var LSKEY="day20mock:v2:"+(CONFIG.setId||"set");
+var S=null, emus={}, curSimIdx=0, curDev=0, timerInt=null, saveInt=null, histIdx=-1;
+
+function nowSec(){ return Math.floor(Date.now()/1000); }
+function totalItems(){ return SIMS.length + SELECT.length; }
+
+function freshState(name){
+  var order=SELECT.map(function(_,i){return i;});
+  for(var i=order.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=order[i];order[i]=order[j];order[j]=t; }
+  return { name:name, startedAt:nowSec(), submitted:false, pos:0, mcqOrder:order, answers:{}, simState:{}, resultCache:null };
+}
+function buildSeq(){
+  var s=[]; SIMS.forEach(function(sim,i){ s.push({kind:'sim',si:i,simId:sim.simId}); });
+  S.mcqOrder.forEach(function(qi){ s.push({kind:'mcq',qi:qi}); });
+  return s;
+}
+
+/* ---------- 永続化 ---------- */
+function save(){
+  if(!S) return;
+  SIMS.forEach(function(sim){
+    var dm=emus[sim.simId]; if(!dm) return;
+    S.simState[sim.simId]=S.simState[sim.simId]||{};
+    Object.keys(dm).forEach(function(dn){
+      S.simState[sim.simId][dn]={running:renderConfig(dm[dn].cfg), startup:renderConfig(dm[dn].startup), history:(dm[dn].history||[]).slice()};
+    });
+  });
+  try{ localStorage.setItem(LSKEY, JSON.stringify(S)); flashSaved(); }catch(e){}
+}
+function flashSaved(){ var el=document.getElementById('saveInd'); if(el) el.textContent="保存済 "+new Date().toLocaleTimeString(); }
+function loadSaved(){ try{ var t=localStorage.getItem(LSKEY); return t?JSON.parse(t):null; }catch(e){ return null; } }
+
+/* ---------- 起動 ---------- */
+function init(){
+  var saved=loadSaved();
+  if(saved && !saved.submitted && saved.mcqOrder){
+    document.getElementById('resumeBox').classList.remove('hidden');
+    var rem=Math.max(0, CONFIG.timeLimitSec-(nowSec()-saved.startedAt));
+    document.getElementById('resumeInfo').textContent=
+      "受験者: "+saved.name+" / 残り "+fmtTime(rem)+" / 進捗 "+(saved.pos+1)+"/"+totalItems();
+    document.getElementById('btnResume').onclick=function(){ S=saved; beginExam(); };
+    document.getElementById('btnDiscard').onclick=function(){ localStorage.removeItem(LSKEY); location.reload(); };
+  }
+  var ni=document.getElementById('nameInput'), bs=document.getElementById('btnStart');
+  ni.oninput=function(){ bs.disabled = ni.value.trim()===''; };
+  bs.onclick=function(){ S=freshState(ni.value.trim()); beginExam(); };
+}
+
+function beginExam(){
+  document.getElementById('screen-start').classList.add('hidden');
+  document.getElementById('screen-exam').classList.remove('hidden');
+  document.getElementById('hdrName').textContent=S.name;
+  SIMS.forEach(function(sim){
+    emus[sim.simId]={};
+    sim.baseline.devices.forEach(function(d){
+      var e=createEmu(d); e.simId=sim.simId;
+      var st=S.simState[sim.simId] && S.simState[sim.simId][d.name];
+      if(st){ e.cfg=parseConfig(st.running); e.startup=parseConfig(st.startup); e.mode='priv'; if(st.history) e.history=st.history.slice(); }
+      emus[sim.simId][d.name]=e;
+    });
+  });
+  setupSubtabs(); setupTermInput();
+  document.getElementById('btnNext').onclick=advance;
+  startTimer();
+  if(saveInt) clearInterval(saveInt);
+  saveInt=setInterval(save, (CONFIG.autosaveSec||5)*1000);
+  renderCurrent();
+}
+
+/* ---------- タイマー ---------- */
+function fmtTime(s){ var m=Math.floor(s/60); return (m<10?"0":"")+m+":"+((s%60)<10?"0":"")+(s%60); }
+function startTimer(){ if(timerInt) clearInterval(timerInt); tick(); timerInt=setInterval(tick,1000); }
+var warned={};
+function tick(){
+  var rem=CONFIG.timeLimitSec-(nowSec()-S.startedAt);
+  var el=document.getElementById('timer');
+  if(rem<=0){ el.textContent="00:00"; clearInterval(timerInt); doSubmit(); return; }
+  el.textContent=fmtTime(rem);
+  el.className=""; if(rem<=60) el.className="crit"; else if(rem<=300) el.className="warn";
+  [600,300,60].forEach(function(w){ if(rem<=w && !warned[w]){ warned[w]=true; document.title="[残り "+(w/60)+"分] 炎のCCNA 模擬②"; } });
+}
+
+/* ---------- 一方向ナビ ---------- */
+function advance(){
+  var seq=buildSeq();
+  var cur=seq[S.pos];
+  var last=(S.pos>=seq.length-1);
+  if(last){
+    if(!confirm("これが最後の問題です。試験を終了して採点しますか？（戻れません）")) return;
+    doSubmit(); return;
+  }
+  if(cur && cur.kind==='sim'){
+    if(!confirm("次の問題へ進みます。前の問題には戻れません。よろしいですか？")) return;
+  }
+  S.pos++; save(); renderCurrent(); window.scrollTo(0,0);
+}
+
+function renderCurrent(){
+  var seq=buildSeq(); var item=seq[S.pos];
+  var isSim=(item.kind==='sim');
+  document.getElementById('pane-sim').classList.toggle('hidden', !isSim);
+  document.getElementById('pane-mcq').classList.toggle('hidden', isSim);
+  if(isSim){ document.getElementById('hdrMode').textContent="SIM "+(item.si+1)+"/"+SIMS.length; }
+  else { document.getElementById('hdrMode').textContent="選択 "+(S.pos-SIMS.length+1)+"/"+SELECT.length; }
+  document.getElementById('hdrPos').textContent="問題 "+(S.pos+1)+"/"+seq.length;
+  document.getElementById('btnNext').textContent = (S.pos>=seq.length-1) ? "End exam & grade ▶" : "Next →";
+  if(isSim){ curSimIdx=item.si; curDev=0; renderSim(); selectSubtab('topo'); }
+  else { renderMcq(item.qi); }
+  var bn=document.getElementById('btnNext'); if(bn){ bn.disabled = isSim? false : ((S.answers[SELECT[item.qi].id]||[]).length===0); }
+}
+
+/* ---------- 選択 ---------- */
+function renderMcq(qi){
+  var q=SELECT[qi]; var box=document.getElementById('qbox');
+  var ans=S.answers[q.id]||[];
+  var html="";
+  html+="<div class='qmeta'>"+(DOMAIN_LABEL[q.domain]||q.domain)+" ・ "+(q.type==='multi'?"複数選択（あてはまるものをすべて）":"単一選択")+" ・ "+esc(q.source)+"</div>";
+  if(q.image && /^data:/.test(q.image)) html+="<img class='qimg' src='"+q.image+"' alt='構成図'>";
+  html+="<div class='qtext'>"+formatQuestion(q.question)+"</div>";
+  q.choices.forEach(function(ch,i){
+    var checked=ans.indexOf(i)>=0;
+    html+="<label class='choice'><input type='"+(q.type==='multi'?'checkbox':'radio')+"' name='ch' value='"+i+"' "+(checked?'checked':'')+"> <span>"+esc(ch)+"</span></label>";
+  });
+  box.innerHTML=html;
+  Array.prototype.forEach.call(box.querySelectorAll("input[name=ch]"),function(inp){
+    inp.onchange=function(){
+      var sel=[];
+      Array.prototype.forEach.call(box.querySelectorAll("input[name=ch]"),function(x){ if(x.checked) sel.push(+x.value); });
+      S.answers[q.id]=sel; save();
+      var bn=document.getElementById('btnNext'); if(bn) bn.disabled=(sel.length===0);
+    };
+  });
+}
+function formatQuestion(t){
+  var parts=String(t).split(/```/); var html="";
+  for(var i=0;i<parts.length;i++){
+    if(i%2===1){ html+="<pre>"+esc(parts[i].replace(/^\n/,''))+"</pre>"; }
+    else html+=esc(parts[i]);
+  }
+  return html;
+}
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+/* ---------- SIM ---------- */
+function setupSubtabs(){
+  Array.prototype.forEach.call(document.querySelectorAll('#subtabs button'),function(b){
+    b.onclick=function(){ selectSubtab(b.dataset.sub); };
+  });
+}
+function selectSubtab(sub){
+  Array.prototype.forEach.call(document.querySelectorAll('#subtabs button'),function(b){ b.classList.toggle('active', b.dataset.sub===sub); });
+  document.getElementById('sub-topo').classList.toggle('hidden', sub!=='topo');
+  document.getElementById('sub-tasks').classList.toggle('hidden', sub!=='tasks');
+  document.getElementById('sub-guide').classList.toggle('hidden', sub!=='guide');
+}
+function examDevs(){ return SIMS[curSimIdx].baseline.devices.filter(function(d){ return d.role==='exam'; }); }
+function renderSim(){
+  var sim=SIMS[curSimIdx];
+  document.getElementById('simReq').innerHTML=sim.requirements.map(function(r){return "<li>"+esc(r)+"</li>";}).join('');
+  var topo=document.getElementById('simTopo'); topo.innerHTML=topoSVG(sim.simId);
+  document.getElementById('simTopoRef').textContent="";
+  var devs=examDevs();
+  if(curDev>=devs.length||curDev<0) curDev=0;
+  var dt=document.getElementById('devtabs'); dt.innerHTML="";
+  devs.forEach(function(d,i){
+    var b=document.createElement('button'); b.textContent=d.name; b.className=(i===curDev?'active':'');
+    b.onclick=function(){ curDev=i; renderSim(); };
+    dt.appendChild(b);
+  });
+  var ti=document.getElementById('termin'); if(ti){ ti.disabled=false; ti.placeholder=""; }
+  renderTerm();
+}
+function curEmu(){ var sim=SIMS[curSimIdx]; var dev=examDevs()[curDev]; return dev?emus[sim.simId][dev.name]:null; }
+function renderTerm(){
+  var e=curEmu(); if(!e) return;
+  document.getElementById('termout').textContent=e.outBuf.join('\n');
+  document.getElementById('termprompt').textContent=promptFor(e)+" ";
+  var to=document.getElementById('termout'); to.scrollTop=to.scrollHeight;
+  var ti=document.getElementById('termin'); if(ti && ti.focus) ti.focus();
+}
+function setupTermInput(){
+  var inp=document.getElementById('termin');
+  inp.onkeydown=function(ev){
+    var e=curEmu(); if(!e) return;
+    if(ev.key==='Enter'){
+      var raw=inp.value; e.outBuf.push(promptFor(e)+" "+raw);
+      if(e.confirm){ e.outBuf.push(e.confirm.msg+raw); }
+      var res=evalLine(e, raw);
+      res.out.forEach(function(l){ e.outBuf.push(l); });
+      if(raw.trim()!=='') e.history.push(raw);
+      histIdx=e.history.length; inp.value=""; save(); renderTerm();
+      ev.preventDefault();
+    } else if(ev.key==='ArrowUp'){ if(e.history.length){ histIdx=Math.max(0,histIdx-1); inp.value=e.history[histIdx]||""; } ev.preventDefault(); }
+    else if(ev.key==='ArrowDown'){ if(e.history.length){ histIdx=Math.min(e.history.length,histIdx+1); inp.value=e.history[histIdx]||""; } ev.preventDefault(); }
+    else if(ev.key==='Tab'){ inp.value=tabComplete(e, inp.value); ev.preventDefault(); }
+    else if(ev.key==='?'){ var line=inp.value; e.outBuf.push(promptFor(e)+" "+line+"?"); helpFor(e, line.trim()).forEach(function(l){ e.outBuf.push(l); }); renderTerm(); ev.preventDefault(); }
+  };
+}
+
+/* =====================================================================
+   9. 提出 / 採点 / 結果
+   ===================================================================== */
+async function findCorrect(q){
+  var n=q.choices.length;
+  if(q.type==='multi'){
+    for(var mk=1; mk<(1<<n); mk++){ var s=[]; for(var i=0;i<n;i++) if(mk&(1<<i)) s.push(i); if(await selectHash(q.id,s)===q.answerHash) return s; }
+    return [];
+  }
+  for(var i=0;i<n;i++){ if(await selectHash(q.id,[i])===q.answerHash) return [i]; }
+  return [];
+}
+async function doSubmit(){
+  if(S.submitted && S.resultCache){ showResult(S.resultCache); return; }
+  if(timerInt) clearInterval(timerInt); if(saveInt) clearInterval(saveInt);
+  save();
+  var domainTot={}, domainOk={}, selDetail=[], selScore=0;
+  for(var pos=0;pos<SELECT.length;pos++){
+    var q=SELECT[pos];
+    domainTot[q.domain]=(domainTot[q.domain]||0)+1;
+    var ans=(S.answers[q.id]||[]).slice();
+    var correct=false;
+    if(ans.length){ var h=await selectHash(q.id, ans); correct=(h===q.answerHash); }
+    if(correct){ selScore++; domainOk[q.domain]=(domainOk[q.domain]||0)+1; }
+    var correctIdx=await findCorrect(q);
+    selDetail.push({id:q.id, domain:q.domain, correct:correct, answered:ans.length>0, q:q, selected:ans, correctIdx:correctIdx});
+  }
+  var simResults=[], simScore=0;
+  SIMS.forEach(function(sim){
+    var dm=emus[sim.simId]; var startups={};
+    sim.baseline.devices.forEach(function(d){ startups[d.name]= dm&&dm[d.name]? dm[d.name].startup : parseConfig(d.baselineStartup); });
+    var r=scoreSim(sim, startups);
+    r.unsaved=[]; r.devices=[];
+    sim.baseline.devices.forEach(function(d){ if(d.role!=='exam') return; var em=dm&&dm[d.name];
+      var saved = em? (renderConfig(em.cfg)===renderConfig(em.startup)) : false;
+      if(em && !saved) r.unsaved.push(d.name);
+      var fk=((sim.finishedKey&&sim.finishedKey.devices)||[]).filter(function(x){return x.name===d.name;})[0];
+      r.devices.push({ name:d.name, type:d.type,
+        running: em? renderConfig(em.cfg) : d.baselineRunning,
+        startup: em? renderConfig(em.startup) : d.baselineStartup,
+        history: em? (em.history||[]).slice() : [],
+        finished: fk? fk.finishedRunning : "", saved: saved });
+    });
+    simScore+=r.earned; simResults.push(r);
+  });
+  var total=selScore+simScore;
+  var pass= total >= Math.round((CONFIG.passRate||0.9)*100);
+  var result={ name:S.name, submittedAt:new Date().toISOString(), total:total, pass:pass,
+    selectScore:selScore, simScore:simScore, domainTot:domainTot, domainOk:domainOk, selDetail:selDetail, simResults:simResults };
+  S.submitted=true; S.resultCache=result; save();
+  showResult(result); sendToGAS(result);
+}
+
+function showResult(r){
+  document.getElementById('screen-exam').classList.add('hidden');
+  var el=document.getElementById('screen-result'); el.classList.remove('hidden');
+  var domHtml=Object.keys(CONFIG.domainConfig||{}).map(function(d){
+    var tot=r.domainTot[d]||0, ok=r.domainOk[d]||0, pct=tot?Math.round(ok/tot*100):0;
+    return "<tr><td>"+(DOMAIN_LABEL[d]||d)+"</td><td>"+ok+"/"+tot+"</td><td><div class='bar'><i style='width:"+pct+"%'></i></div></td><td>"+pct+"%</td></tr>";
+  }).join('');
+  var simHtml=r.simResults.map(function(s){
+    var pct=Math.round(s.earned/s.points*100);
+    return "<tr><td>"+s.simId+"</td><td>"+s.earned+"/"+s.points+"</td><td><div class='bar'><i style='width:"+pct+"%'></i></div></td><td>"+pct+"%"+(s.unsaved&&s.unsaved.length?" <span class='unsaved'>(未保存:"+s.unsaved.join(',')+")</span>":"")+"</td></tr>";
+  }).join('');
+  var html="";
+  html+="<div class='card'><h1>結果</h1>";
+  html+="<div class='scorebig "+(r.pass?'pass':'fail')+"'>"+r.total+" / 100 点</div>";
+  html+="<div style='font-size:20px' class='"+(r.pass?'pass':'fail')+"'>"+(r.pass?"合格 ("+Math.round((CONFIG.passRate||0.9)*100)+"点以上)":"不合格")+"</div>";
+  html+="<p class='small'>受験者: "+esc(r.name)+" / 選択 "+r.selectScore+"/60 ・ SIM "+r.simScore+"/40</p>";
+  html+="<div id='sendStat' class='small'></div></div>";
+  html+="<div class='card'><h3>ドメイン別正答率</h3><table class='res'><tr><th>ドメイン</th><th>正答</th><th></th><th>率</th></tr>"+domHtml+"</table></div>";
+  html+="<div class='card'><h3>SIM別達成率</h3><table class='res'><tr><th>SIM</th><th>得点</th><th></th><th>率</th></tr>"+simHtml+"</table>";
+  html+="<div class='accordion' id='simDetailToggle'>▼ SIM 要素別の加点/未加点を表示</div><div id='simDetail' class='hidden'>";
+  r.simResults.forEach(function(s){
+    html+="<h4>"+s.simId+" ("+s.earned+"/"+s.points+")"+(s.unsaved&&s.unsaved.length?" <span class='unsaved'>未保存機器: "+s.unsaved.join(',')+" → 0点</span>":"")+"</h4>";
+    s.elements.forEach(function(e){
+      var x=e.el||{}; var exp=(x.expect||[]).join(' / ');
+      if(x.expectAbsent&&x.expectAbsent.length) exp+=(exp?' / ':'')+'(なし: '+x.expectAbsent.join(', ')+')';
+      html+="<div class='elem "+(e.got?'got':'miss')+"'><span>"+esc(e.desc)+" <span class='small'>["+e.device+"]"+(exp?" 期待: <code>"+esc(exp)+"</code>":"")+"</span></span><span>"+(e.got?("+"+e.weight):"0")+" / "+e.weight+"</span></div>";
+    });
+    (s.devices||[]).forEach(function(d){
+      html+="<details class='revdev'><summary>"+esc(d.name)+" の入力コマンドと設定を表示"+(d.saved?"":" <span class='unsaved'>(未保存→0点)</span>")+"</summary>";
+      html+="<div class='revh'>入力したコマンド ("+((d.history||[]).length)+"行)</div><pre class='rev'>"+esc((d.history||[]).join('\n')||"(記録なし)")+"</pre>";
+      html+="<div class='revgrid'><div><div class='revh'>あなたの最終設定</div><pre class='rev'>"+esc(d.running||"")+"</pre></div><div><div class='revh ok'>模範解答</div><pre class='rev'>"+esc(d.finished||"(なし)")+"</pre></div></div>";
+      html+="</details>";
+    });
+  });
+  html+="</div></div>";
+  html+="<div class='card'><div class='accordion' id='selDetailToggle'>▼ 選択 各問の正誤・出典を表示</div><div id='selDetail' class='hidden'>";
+  r.selDetail.forEach(function(d){
+    html+="<div class='resq "+(d.correct?'correct':'wrong')+"'>";
+    html+="<div><span class='badge "+(d.correct?'ok':'ng')+"'>"+(d.correct?'正解':(d.answered?'不正解':'未回答'))+"</span> <b>"+(DOMAIN_LABEL[d.domain]||d.domain)+"</b> <span class='small'>"+esc(d.q.source)+"</span></div>";
+    html+="<div class='small' style='margin-top:4px'>"+esc(d.q.question.split('\n')[0]).slice(0,120)+"</div>";
+    var selTxt=(d.selected||[]).map(function(i){return String.fromCharCode(65+i)+". "+(d.q.choices[i]||"");}).join(' / ')||"(未回答)";
+    var corTxt=(d.correctIdx||[]).map(function(i){return String.fromCharCode(65+i)+". "+(d.q.choices[i]||"");}).join(' / ');
+    html+="<div class='small' style='margin-top:4px'>あなたの選択: "+esc(selTxt)+"</div>";
+    if(corTxt) html+="<div class='small' style='margin-top:2px;color:var(--ok)'>正解: "+esc(corTxt)+"</div>";
+    if(d.q.explanation) html+="<div class='small' style='margin-top:4px'>解説: "+esc(d.q.explanation)+"</div>";
+    html+="</div>";
+  });
+  html+="</div></div>";
+  html+="<div class='card'><h3>成績レポート（PDF）</h3><p class='small'>あなたの成績とSIM/選択問題の正誤を1つのPDFとして保存できます。押すと印刷ダイアログが開くので「PDFとして保存」を選んでください（オフライン・file://単体で生成）。</p>"+
+    "<button class='btn' id='btnPdf'>成績PDFをダウンロード</button>"+
+    "<p class='small' style='margin-top:6px'>※ このPDFは氏名・答案全体を含む個人情報です。取り扱いにご注意ください。</p></div>";
+  html+="<div class='card'><h3>結果データ（退路）</h3><p class='small'>送信が失敗した場合に備え、結果JSONをコピー/ダウンロードできます。</p>"+
+    "<button class='btn sec' id='btnCopy'>Copy result JSON</button> <button class='btn sec' id='btnDl'>Download JSON</button>"+
+    "<textarea id='jsonArea' style='width:100%;height:120px;margin-top:10px;background:var(--panel2);color:var(--fg);border:1px solid var(--border);border-radius:6px;font-family:Consolas,monospace;font-size:11px'></textarea></div>";
+  el.innerHTML=html;
+  document.getElementById('btnPdf').onclick=function(){ openPrintView(r); };
+  var payload=buildPayload(r);
+  document.getElementById('jsonArea').value=JSON.stringify(payload,null,2);
+  document.getElementById('simDetailToggle').onclick=function(){ document.getElementById('simDetail').classList.toggle('hidden'); };
+  document.getElementById('selDetailToggle').onclick=function(){ document.getElementById('selDetail').classList.toggle('hidden'); };
+  document.getElementById('btnCopy').onclick=function(){ var a=document.getElementById('jsonArea'); a.select(); try{document.execCommand('copy');}catch(e){} if(navigator.clipboard) navigator.clipboard.writeText(a.value); };
+  document.getElementById('btnDl').onclick=function(){ var blob=new Blob([document.getElementById('jsonArea').value],{type:'application/json'}); var u=URL.createObjectURL(blob); var a=document.createElement('a'); a.href=u; a.download="day20mock_"+r.name.replace(/\s/g,'_')+".json"; a.click(); URL.revokeObjectURL(u); };
+  window.scrollTo(0,0);
+}
+function buildPayload(r){
+  var domain={}; Object.keys(CONFIG.domainConfig||{}).forEach(function(d){ var t=r.domainTot[d]||0,ok=r.domainOk[d]||0; domain[d]= t? +(ok/t).toFixed(3):0; });
+  var sim={}; r.simResults.forEach(function(s){ sim[s.simId]=+(s.earned/s.points).toFixed(3); });
+  var reviewMcq=r.selDetail.map(function(d){
+    return { id:d.id, domain:d.domain, source:d.q.source, type:d.q.type||'single',
+      question:d.q.question, choices:d.q.choices,
+      selected:d.selected||[], correctIdx:d.correctIdx||[], correct:d.correct, answered:d.answered,
+      explanation:d.q.explanation||"" };
+  });
+  var reviewSim=r.simResults.map(function(s){
+    return { simId:s.simId, earned:s.earned, points:s.points, unsaved:s.unsaved||[],
+      elements:s.elements.map(function(e){ var x=e.el||{}; return { desc:e.desc, weight:e.weight, device:e.device, got:e.got,
+        section:x.section||"", iface:x.interface||"", expect:x.expect||[], accept:x.accept||[], expectAbsent:x.expectAbsent||[] }; }),
+      devices:(s.devices||[]).map(function(d){ return { name:d.name, running:d.running, finished:d.finished, history:d.history||[], saved:d.saved }; }) };
+  });
+  return { name:r.name, setId:(CONFIG.setId||""), setName:(CONFIG.setName||""), submittedAt:r.submittedAt, total:r.total, pass:r.pass,
+    selectScore:r.selectScore, simScore:r.simScore, domain:domain, sim:sim,
+    detail:r.selDetail.map(function(d){return {id:d.id, correct:d.correct};}),
+    review:{ mcq:reviewMcq, sim:reviewSim } };
+}
+/* ===== 受講者向け成績PDF（出力専用・採点不変・v1.1純加算） =====
+   showResult が受け取る結果オブジェクト r（buildPayload と同一ソース）だけを使い、
+   印刷専用ビューを #printRoot に生成して window.print() する。再採点しない。 */
+function pfPct(n,d){ return d? Math.round(n/d*100):0; }
+function buildPrintView(r){
+  var thr=Math.round((CONFIG.passRate||0.9)*100);
+  var dkeys=Object.keys(CONFIG.domainConfig||{}); if(!dkeys.length) dkeys=Object.keys(r.domainTot||{});
+  var h='';
+  h+="<div class='pf-page'>";
+  h+="<div class='pf-h1'>炎のCCNA 模擬試験 成績レポート</div>";
+  var setId=(CONFIG.setId||CONFIG.setName||'');
+  h+="<table class='pf'><tr><th>氏名</th><td>"+esc(r.name)+"</td><th>受験日</th><td>"+esc(new Date(r.submittedAt).toLocaleString('ja-JP'))+"</td></tr>"+
+     "<tr><th>セットID</th><td>"+esc(setId||'(未設定)')+"</td><th>判定</th><td class='"+(r.pass?'pf-pass':'pf-fail')+"'><b>"+(r.pass?'合格':'不合格')+"</b>（合格ライン "+thr+"点）</td></tr></table>";
+  h+="<div class='pf-big "+(r.pass?'pf-pass':'pf-fail')+"'>"+r.total+" / 100 点</div>";
+  h+="<div class='pf-meta'>選択 "+r.selectScore+" / 60 ・ SIM "+r.simScore+" / 40</div>";
+  h+="<div class='pf-h2'>ドメイン別正答率</div>";
+  h+="<table class='pf'><tr><th>ドメイン</th><th>正答</th><th>正答率</th></tr>";
+  dkeys.forEach(function(d){ var tot=r.domainTot[d]||0,ok=r.domainOk[d]||0; h+="<tr><td>"+esc(DOMAIN_LABEL[d]||d)+"</td><td>"+ok+" / "+tot+"</td><td>"+pfPct(ok,tot)+"%</td></tr>"; });
+  h+="</table></div>";
+  h+="<div class='pf-page'><div class='pf-h2'>SIM 要素別 合否</div>";
+  r.simResults.forEach(function(s){
+    h+="<div class='pf-avoid'><div class='pf-h3'>"+esc(s.simId)+"（"+s.earned+" / "+s.points+"・"+pfPct(s.earned,s.points)+"%）"+((s.unsaved&&s.unsaved.length)?" <span class='pf-miss'>未保存: "+esc(s.unsaved.join(','))+" → 0点</span>":"")+"</div>";
+    h+="<table class='pf'><tr><th>要素</th><th>機器</th><th>判定</th><th>配点</th></tr>";
+    s.elements.forEach(function(e){ h+="<tr><td>"+esc(e.desc)+"</td><td>"+esc(e.device)+"</td><td class='"+(e.got?'pf-got':'pf-miss')+"'>"+(e.got?'加点':'未加点')+"</td><td>"+(e.got?('+'+e.weight):'0')+" / "+e.weight+"</td></tr>"; });
+    h+="</table>";
+    (s.devices||[]).forEach(function(d){
+      h+="<div class='pf-h4'>"+esc(d.name)+(d.saved?'':" <span class='pf-miss'>(未保存→0点)</span>")+"</div>";
+      h+="<div class='pf-grid'><div><div class='pf-meta'>あなたの最終構成</div><pre class='pf'>"+esc(d.running||'')+"</pre></div><div><div class='pf-meta'>模範解答</div><pre class='pf'>"+esc(d.finished||'(なし)')+"</pre></div></div>";
+      h+="<div class='pf-meta'>入力コマンド ("+((d.history||[]).length)+"行)</div><pre class='pf'>"+esc((d.history||[]).join('\n')||'(記録なし)')+"</pre>";
+    });
+    h+="</div>";
+  });
+  h+="</div>";
+  h+="<div class='pf-page'><div class='pf-h2'>選択問題 正誤明細（全"+r.selDetail.length+"問）</div>";
+  r.selDetail.forEach(function(d,i){
+    var badge=d.correct?"<span class='pf-badge ok'>正解</span>":(d.answered?"<span class='pf-badge ng'>不正解</span>":"<span class='pf-badge na'>未回答</span>");
+    h+="<div class='pf-q "+(d.correct?'correct':'wrong')+" pf-avoid'>";
+    h+="<div>"+badge+" <b>Q"+(i+1)+"</b> "+esc(DOMAIN_LABEL[d.domain]||d.domain)+" <span class='pf-note'>"+esc(d.q.source||'')+"</span></div>";
+    h+="<div class='pf-meta'>"+esc(String(d.q.question).split('\n')[0]).slice(0,140)+"</div>";
+    var sel=(d.selected||[]).map(function(i2){return String.fromCharCode(65+i2)+'. '+(d.q.choices[i2]||'');}).join(' / ')||'(未回答)';
+    var cor=(d.correctIdx||[]).map(function(i2){return String.fromCharCode(65+i2)+'. '+(d.q.choices[i2]||'');}).join(' / ');
+    h+="<div class='pf-meta'>あなたの選択: "+esc(sel)+"</div>";
+    if(cor) h+="<div class='pf-meta pf-got'>正解: "+esc(cor)+"</div>";
+    h+="</div>";
+  });
+  h+="</div>";
+  return h;
+}
+function openPrintView(r){
+  var root=document.getElementById('printRoot');
+  if(!root){ root=document.createElement('div'); root.id='printRoot'; document.body.appendChild(root); }
+  root.innerHTML=buildPrintView(r);
+  window.print();
+}
+
+function sendToGAS(r){
+  var stat=document.getElementById('sendStat'); var url=CONFIG.gasEndpoint||"";
+  if(!url || /__GAS|YOUR_|\.\.\.|example/.test(url)){
+    if(stat) stat.innerHTML="<span class='unsaved'>※ GAS送信先が未設定です。下の「結果JSON」を手動で回収してください。</span>"; return;
+  }
+  var payload=buildPayload(r);
+  try{
+    fetch(url,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({ token:(CONFIG.token||""), payload:payload })})
+      .then(function(){ if(stat) stat.textContent="結果を送信しました（no-cors投げ切り・受領確認なし）。"; })
+      .catch(function(){ if(stat) stat.innerHTML="<span class='unsaved'>送信に失敗しました。下の結果JSONを手動で回収してください。</span>"; });
+    if(stat) stat.textContent="結果を送信しました（no-cors投げ切り・受領確認なし）。";
+  }catch(e){ if(stat) stat.innerHTML="<span class='unsaved'>送信に失敗しました。下の結果JSONを手動で回収してください。</span>"; }
+}
+
+/* ---------- ブート ---------- */
+if(typeof document!=='undefined' && document.getElementById){
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+}
+
+/* ---------- テスト用エクスポート (node検証) ---------- */
+if(typeof window!=='undefined'){
+  window.__MOCK__={ canonIfName:canonIfName, canonVlanList:canonVlanList, canonIpv6:canonIpv6, canonArea:canonArea, canonAce:canonAce, canonPort:canonPort,
+    parseConfig:parseConfig, renderConfig:renderConfig, createEmu:createEmu, evalLine:evalLine, promptFor:promptFor,
+    scoreSim:scoreSim, elementSatisfied:elementSatisfied, selectHash:selectHash, sha256Hex:sha256Hex, findCorrect:findCorrect, buildPayload:buildPayload,
+    buildPrintView:buildPrintView, topoSVG:topoSVG, TOPO:TOPO, SIMS:SIMS, SELECT:SELECT, CONFIG:CONFIG, expandRange:expandRange, cloneCfg:cloneCfg, tabComplete:tabComplete, helpFor:helpFor };
+}
+if(typeof module!=='undefined'&&module.exports){ module.exports=window.__MOCK__; }
+
+})();
+</script>
+</body>
+</html>
