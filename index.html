@@ -85,104 +85,114 @@
    ========================================================================= */
 var MANIFEST = [
   {
+    setId:"D20-S1", setName:"セット1", file:"../99_ref/炎のCCNA_模試アプリ_v1.0.html",
+    lsKey:"day20mock:v2", sim:4, select:60, points:100, pass:80,
+    timeLimitSec:6000, ui:"en", note:"本番Cisco風UI・英語クロム（本体は最新版）"
+  },
+  {
+    setId:"D20-S2", setName:"セット2", file:"../99_ref/炎のCCNA_模試アプリ_セット2_v0.1.html",
+    lsKey:"day20mock:v2:D20-S2", sim:4, select:60, points:100, pass:80,
+    timeLimitSec:6000, ui:"ja", note:"和風UI（v0.8エンジン派生）・出題はセット1と非重複"
+  },
+  {
     setId:"M01", setName:"模試セット01", file:"M01.html",
     lsKey:"day20mock:v2:M01", sim:4, select:60, points:100, pass:90,
-    timeLimitSec:6000, ui:"en", note:"テンプレv1.1(成績PDF付き)・SIMバンク量産[Voice-VLAN/Static-v6/NACL-PortSec/NAT-DHCP-SSH]"
+    timeLimitSec:6000, ui:"en", note:"テンプレv1.1(成績PDF付き)・SIMバンク量産[L3SW-Routed/OSPF-IF/Voice-VLAN/NATpool-DHCP-SSH]"
   },
   {
     setId:"M02", setName:"模試セット02", file:"M02.html",
     lsKey:"day20mock:v2:M02", sim:4, select:60, points:100, pass:90,
-    timeLimitSec:6000, ui:"en", note:"テンプレv1.1(成績PDF付き)・SIMバンク量産[LACP/Static-v4/NACL-Snoop/NATpool-DHCP-SSH]"
+    timeLimitSec:6000, ui:"en", note:"テンプレv1.1(成績PDF付き)・SIMバンク量産[IPv4v6-Assign/IPv4v6-Assign/VLAN-LLDP/Voice-VLAN]"
   },
   {
     setId:"M03", setName:"模試セット03", file:"M03.html",
     lsKey:"day20mock:v2:M03", sim:4, select:60, points:100, pass:90,
-    timeLimitSec:6000, ui:"en", note:"テンプレv1.1(成績PDF付き)・SIMバンク量産[LACP/Static-v4/NACL-Snoop/NAT-Relay-SSH]"
+    timeLimitSec:6000, ui:"en", note:"テンプレv1.1(成績PDF付き)・SIMバンク量産[Static-v4/Voice-VLAN/LACP/NACL-PortSec]"
   },
   {
     setId:"M04", setName:"模試セット04", file:"M04.html",
     lsKey:"day20mock:v2:M04", sim:4, select:60, points:100, pass:90,
-    timeLimitSec:6000, ui:"en", note:"テンプレv1.1(成績PDF付き)・SIMバンク量産[VLAN-CDP/OSPF-IF/NACL-Snoop/PAT-NTP-Relay]"
+    timeLimitSec:6000, ui:"en", note:"テンプレv1.1(成績PDF付き)・SIMバンク量産[Static-v6/OSPF-IF/Static-v4/LACP]"
   },
   {
     setId:"M05", setName:"模試セット05", file:"M05.html",
     lsKey:"day20mock:v2:M05", sim:4, select:60, points:100, pass:90,
-    timeLimitSec:6000, ui:"en", note:"テンプレv1.1(成績PDF付き)・SIMバンク量産[LACP/Static-v4/NACL-Snoop/PAT-NTP-Relay]"
+    timeLimitSec:6000, ui:"en", note:"テンプレv1.1(成績PDF付き)・SIMバンク量産[Static-v4/VLAN-CDP/LACP/NAT-DHCP-SSH]"
   },
   {
     setId:"M06", setName:"模試セット06", file:"M06.html",
     lsKey:"day20mock:v2:M06", sim:4, select:60, points:100, pass:90,
-    timeLimitSec:6000, ui:"en", note:"テンプレv1.1(成績PDF付き)・SIMバンク量産[VLAN-LLDP/Static-v4/NACL-Snoop/NAT-DHCP-SSH]"
+    timeLimitSec:6000, ui:"en", note:"テンプレv1.1(成績PDF付き)・SIMバンク量産[Static-v4/Static-v4/LACP/LACP]"
   },
   {
     setId:"M07", setName:"模試セット07", file:"M07.html",
     lsKey:"day20mock:v2:M07", sim:4, select:60, points:100, pass:90,
-    timeLimitSec:6000, ui:"en", note:"テンプレv1.1(成績PDF付き)・SIMバンク量産[Voice-VLAN/OSPF-IF/NACL-PortSec/NAT-Relay-SSH]"
+    timeLimitSec:6000, ui:"en", note:"テンプレv1.1(成績PDF付き)・SIMバンク量産[OSPF-IF/LACP/VLAN-CDP/NAT-Relay-SSH]"
   },
   {
     setId:"M08", setName:"模試セット08", file:"M08.html",
     lsKey:"day20mock:v2:M08", sim:4, select:60, points:100, pass:90,
-    timeLimitSec:6000, ui:"en", note:"テンプレv1.1(成績PDF付き)・SIMバンク量産[LACP/Static-v4/NACL-Snoop/NATpool-DHCP-SSH]"
+    timeLimitSec:6000, ui:"en", note:"テンプレv1.1(成績PDF付き)・SIMバンク量産[Static-v4/Static-v4/Voice-VLAN/LACP]"
   },
   {
     setId:"M09", setName:"模試セット09", file:"M09.html",
     lsKey:"day20mock:v2:M09", sim:4, select:60, points:100, pass:90,
-    timeLimitSec:6000, ui:"en", note:"テンプレv1.1(成績PDF付き)・SIMバンク量産[LACP/L3SW-Routed/NACL-Snoop/NATpool-DHCP-SSH]"
+    timeLimitSec:6000, ui:"en", note:"テンプレv1.1(成績PDF付き)・SIMバンク量産[L3SW-Routed/Static-v4/LACP/Voice-VLAN]"
   },
   {
     setId:"M10", setName:"模試セット10", file:"M10.html",
     lsKey:"day20mock:v2:M10", sim:4, select:60, points:100, pass:90,
-    timeLimitSec:6000, ui:"en", note:"テンプレv1.1(成績PDF付き)・SIMバンク量産[LACP/IPv4v6-Assign/NACL-Snoop/NAT-DHCP-SSH]"
+    timeLimitSec:6000, ui:"en", note:"テンプレv1.1(成績PDF付き)・SIMバンク量産[Static-v6/Static-v4/VLAN-CDP/LACP]"
   },
   {
     setId:"M11", setName:"模試セット11", file:"M11.html",
     lsKey:"day20mock:v2:M11", sim:4, select:60, points:100, pass:90,
-    timeLimitSec:6000, ui:"en", note:"テンプレv1.1(成績PDF付き)・SIMバンク量産[Voice-VLAN/IPv4v6-Assign/NACL-PortSec/PAT-NTP-Relay]"
+    timeLimitSec:6000, ui:"en", note:"テンプレv1.1(成績PDF付き)・SIMバンク量産[OSPF-IF/Voice-VLAN/LACP/NACL-Snoop]"
   },
   {
     setId:"M12", setName:"模試セット12", file:"M12.html",
     lsKey:"day20mock:v2:M12", sim:4, select:60, points:100, pass:90,
-    timeLimitSec:6000, ui:"en", note:"テンプレv1.1(成績PDF付き)・SIMバンク量産[Voice-VLAN/OSPF-IF/NACL-Snoop/NAT-Relay-SSH]"
+    timeLimitSec:6000, ui:"en", note:"テンプレv1.1(成績PDF付き)・SIMバンク量産[Static-v4/IPv4v6-Assign/VLAN-CDP/LACP]"
   },
   {
     setId:"M13", setName:"模試セット13", file:"M13.html",
     lsKey:"day20mock:v2:M13", sim:4, select:60, points:100, pass:90,
-    timeLimitSec:6000, ui:"en", note:"テンプレv1.1(成績PDF付き)・SIMバンク量産[LACP/OSPF-IF/NACL-Snoop/NATpool-DHCP-SSH]"
+    timeLimitSec:6000, ui:"en", note:"テンプレv1.1(成績PDF付き)・SIMバンク量産[OSPF-IF/OSPF-IF/Voice-VLAN/LACP]"
   },
   {
     setId:"M14", setName:"模試セット14", file:"M14.html",
     lsKey:"day20mock:v2:M14", sim:4, select:60, points:100, pass:90,
-    timeLimitSec:6000, ui:"en", note:"テンプレv1.1(成績PDF付き)・SIMバンク量産[VLAN-CDP/Static-v4/NACL-Snoop/NAT-DHCP-SSH]"
+    timeLimitSec:6000, ui:"en", note:"テンプレv1.1(成績PDF付き)・SIMバンク量産[IPv4v6-Assign/VLAN-LLDP/LACP/PAT-NTP-Relay]"
   },
   {
     setId:"M15", setName:"模試セット15", file:"M15.html",
     lsKey:"day20mock:v2:M15", sim:4, select:60, points:100, pass:90,
-    timeLimitSec:6000, ui:"en", note:"テンプレv1.1(成績PDF付き)・SIMバンク量産[VLAN-LLDP/Static-v6/NACL-Snoop/NAT-Relay-SSH]"
+    timeLimitSec:6000, ui:"en", note:"テンプレv1.1(成績PDF付き)・SIMバンク量産[Static-v4/Static-v4/Voice-VLAN/LACP]"
   },
   {
     setId:"M16", setName:"模試セット16", file:"M16.html",
     lsKey:"day20mock:v2:M16", sim:4, select:60, points:100, pass:90,
-    timeLimitSec:6000, ui:"en", note:"テンプレv1.1(成績PDF付き)・SIMバンク量産[LACP/Static-v4/NACL-PortSec/PAT-NTP-Relay]"
+    timeLimitSec:6000, ui:"en", note:"テンプレv1.1(成績PDF付き)・SIMバンク量産[Static-v6/VLAN-CDP/LACP/NACL-Snoop]"
   },
   {
     setId:"M17", setName:"模試セット17", file:"M17.html",
     lsKey:"day20mock:v2:M17", sim:4, select:60, points:100, pass:90,
-    timeLimitSec:6000, ui:"en", note:"テンプレv1.1(成績PDF付き)・SIMバンク量産[Voice-VLAN/Static-v4/NACL-Snoop/PAT-NTP-Relay]"
+    timeLimitSec:6000, ui:"en", note:"テンプレv1.1(成績PDF付き)・SIMバンク量産[L3SW-Routed/OSPF-IF/LACP/LACP]"
   },
   {
     setId:"M18", setName:"模試セット18", file:"M18.html",
     lsKey:"day20mock:v2:M18", sim:4, select:60, points:100, pass:90,
-    timeLimitSec:6000, ui:"en", note:"テンプレv1.1(成績PDF付き)・SIMバンク量産[Voice-VLAN/L3SW-Routed/NACL-Snoop/NAT-DHCP-SSH]"
+    timeLimitSec:6000, ui:"en", note:"テンプレv1.1(成績PDF付き)・SIMバンク量産[Static-v4/VLAN-LLDP/VLAN-CDP/LACP]"
   },
   {
     setId:"M19", setName:"模試セット19", file:"M19.html",
     lsKey:"day20mock:v2:M19", sim:4, select:60, points:100, pass:90,
-    timeLimitSec:6000, ui:"en", note:"テンプレv1.1(成績PDF付き)・SIMバンク量産[LACP/OSPF-IF/NACL-PortSec/NAT-Relay-SSH]"
+    timeLimitSec:6000, ui:"en", note:"テンプレv1.1(成績PDF付き)・SIMバンク量産[Static-v4/Voice-VLAN/LACP/Voice-VLAN]"
   },
   {
     setId:"M20", setName:"模試セット20", file:"M20.html",
     lsKey:"day20mock:v2:M20", sim:4, select:60, points:100, pass:90,
-    timeLimitSec:6000, ui:"en", note:"テンプレv1.1(成績PDF付き)・SIMバンク量産[LACP/IPv4v6-Assign/NACL-Snoop/NATpool-DHCP-SSH]"
+    timeLimitSec:6000, ui:"en", note:"テンプレv1.1(成績PDF付き)・SIMバンク量産[Static-v4/IPv4v6-Assign/Voice-VLAN/NACL-Snoop]"
   }
 ];
 
